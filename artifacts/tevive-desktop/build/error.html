@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100vh;
+    background: #0a0a0a;
+    font-family: 'Space Mono', 'Courier New', monospace;
+    color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .box {
+    text-align: center;
+    max-width: 480px;
+    padding: 48px;
+    border: 1px solid #1e1e1e;
+  }
+  .icon { font-size: 40px; color: #ef4444; margin-bottom: 20px; }
+  h1 { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+  p { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 28px; }
+  button {
+    background: #22c55e;
+    color: #0a0a0a;
+    border: none;
+    padding: 10px 28px;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:hover { background: #16a34a; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="icon">&#9888;</div>
+  <h1>Connection Failed</h1>
+  <p>Unable to reach the Tevive platform. Check your internet connection and try again.</p>
+  <button onclick="location.reload()">Retry</button>
+</div>
+</body>
+</html>
