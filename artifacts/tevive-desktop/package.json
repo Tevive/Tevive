@@ -1,17 +1,50 @@
 {
   "name": "@workspace/tevive-desktop",
   "version": "0.0.0.1",
-  "description": "Tevive - D™YHÖRÆFf÷&ÒFW6·F÷6Æ–VçB"À¢&Ö–â#¢&F—7BöÖ–âæŒˆ°(€€‰ÍÉ¥ÁÑÌˆèì(€€€€‰‰Õ¥±ˆè€„sc -p tsconfig.json",
-    "dist9Ú[ˆˆØÈ\ØÛÛ™šYËš6öâbbVÆV7G&öâÖ'V–ÆFW"Ò×v–âÒ×ƒcB"À¢'7F'B#¢'G62×G66öæf–ræ½¸€˜˜•±•ÑÉ½¸€¸ˆ(€ô°(€€‰‘•Á•¹‘•¹¥•Ìˆèì(€€€€‰•±•ÑÉ½¸µÕÁ‘…Ñ•Èˆè€‰xØ¸Ì¸äˆ(€ô°(€€‰‘•Ù•Á•¹‘•¹¥•Ìˆèì(€€€€‰•±•ÑÉ½¸ˆè€‰xÌÌ¸Ì¸Äˆ°(€€€€‰•±•ÑÉ½¸µ…ilder": "^25.1.8",
+  "description": "Tevive - Free game platform desktop client",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dist:win": "tsc -p tsconfig.json && electron-builder --win --x64",
+    "start": "tsc -p tsconfig.json && electron ."
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
     "typescript": "^5.0.0",
     "@types/node": "^20.0.0"
   },
   "build": {
     "appId": "io.tevive.app",
     "productName": "Tevive",
-    "copyright": "CopyriZ0ªHŒˆ]š]™H‹ˆ™\™XİÜšY\ÈˆÂˆ›İ]]ˆ&VÆV6R ¢ÒÀ¢&f–ÆW2#¢°¢&F—7Bò¢¢ò¢"À¢&'V–ÆBò¢¢ò¢ ¢ÒÀ¢¥¸ˆèì(€€€€€€„arget": [
+    "copyright": "Copyright 2026 Tevive",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "build/**/*"
+    ],
+    "win": {
+      "target": [
         {
           "target": "nsis",
-          "arch": ["—BˆBˆBˆKˆ›œÚ\ÈˆÂˆ›Û™PÛXÚÈˆ˜[ÙKˆ˜[İÕĞÚ[–T–ç7FÆÆF–öäF—&V7F÷'’#¢G'VRÀ¢&ÆÆ÷tVÆWfF–öâ#¢G'VRÀ¢&7&VFTFW6·F÷6†÷ÕĞˆèÑÅe,
-      "createStaqY[TÚÜF7WB#¢G”°(€€€€€€‰Í¡½ÄcutName": "Tevive",
-      "licelÙHˆ‹‹‹Ë‹‹Ñ][K‹ˆ˜\Y˜Xİ˜[YHˆ]š]™WÜÙ]\İÚ[™İÜË™^H‚ˆBˆBŸB
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Tevive",
+      "license": "../../Eula.txt",
+      "artifactName": "tevive_setup_windows.exe"
+    }
+  }
+}
