@@ -1,0 +1,31 @@
+End User License Agreement (EULA)
+
+Copyright (c) 2026 Tevive
+
+By downloading, installing, or using Tevive, you agree to the following terms.
+
+### Allowed
+
+* Use Tevive for personal or commercial purposes.
+* Share unmodified copies of the compiled application (such as EXE, APK, or installer files).
+
+### Not Allowed
+
+* Copy, publish, distribute, or share the source code.
+* Modify, reverse engineer, or create derivative works based on Tevive.
+* Use any part of the source code in another project.
+* Sell, sublicense, or redistribute modified versions without written permission.
+
+### Ownership
+
+Tevive and all related intellectual property, including the source code, remain the exclusive property of the copyright holder.
+
+### Disclaimer
+
+Tevive is provided "as is", without warranty of any kind. The copyright holder shall not be liable for any damages arising from the use of the software.
+
+### Termination
+
+This license automatically terminates if you violate any of these terms.
+
+By using Tevive, you acknowledge and agree to this EULA.
