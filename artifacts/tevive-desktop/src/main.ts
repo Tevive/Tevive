@@ -2,12 +2,6 @@ import { app, BrowserWindow, shell, ipcMain, nativeTheme } from "electron";
 import path from "path";
 import { autoUpdater } from "electron-updater";
 
-// The URL of the Tevive platform — set TEVIVE_URL env var to override
-const TEVIVE_URL =
-  process.env.TEVIVE_URL ||
-  process.env.REPLIT_DOMAINS?.split(",")[0]?.trim() ||
-  "https://tevive.replit.app";
-
 const isDev = process.env.NODE_ENV === "development";
 
 function createSplashWindow(): BrowserWindow {
@@ -52,7 +46,8 @@ function createMainWindow(splash: BrowserWindow): void {
 
   nativeTheme.themeSource = "dark";
 
-  win.loadURL(TEVIVE_URL);
+  // Load the bundled frontend — runs entirely on this PC, no external server needed
+  win.loadFile(path.join(__dirname, "../build/index.html"));
 
   win.webContents.on("did-finish-load", () => {
     splash.destroy();
@@ -68,13 +63,10 @@ function createMainWindow(splash: BrowserWindow): void {
     console.error("Failed to load Tevive:", desc);
   });
 
-  // Open external links in the default browser, not inside the app
+  // Open external links in the default browser
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (!url.startsWith(TEVIVE_URL)) {
-      shell.openExternal(url);
-      return { action: "deny" };
-    }
-    return { action: "allow" };
+    shell.openExternal(url);
+    return { action: "deny" };
   });
 
   win.on("page-title-updated", (e) => e.preventDefault());
