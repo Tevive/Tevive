@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tevive</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --border: #222222;
+      --accent: #7c3aed;
+      --accent2: #a855f7;
+      --text: #f0f0f0;
+      --muted: #666666;
+      --green: #22c55e;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Titlebar */
+    .titlebar {
+      height: 38px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      -webkit-app-region: drag;
+      flex-shrink: 0;
+    }
+    .titlebar-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent2);
+      -webkit-app-region: no-drag;
+    }
+    .titlebar-version {
+      font-size: 10px;
+      color: var(--muted);
+      margin-left: 8px;
+      -webkit-app-region: no-drag;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 200px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+      flex-shrink: 0;
+    }
+    .sidebar-section {
+      padding: 4px 12px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #aaaaaa;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active {
+      background: var(--bg3);
+      color: var(--text);
+      border-left-color: var(--accent);
+    }
+    .nav-icon { font-size: 14px; width: 16px; text-align: center; }
+
+    /* Main content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .content::-webkit-scrollbar { width: 6px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Page header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .page-title { font-size: 20px; font-weight: 700; }
+    .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* Search bar */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      width: 260px;
+    }
+    .search-bar input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 13px;
+      width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--muted); }
+
+    /* Button */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+
+    /* Game grid */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .game-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .game-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .game-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .game-info { padding: 12px; }
+    .game-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .game-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .game-tag {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .badge-free {
+      background: rgba(34,197,94,0.15);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Section label */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      margin-top: 28px;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .stat-value { font-size: 28px; font-weight: 800; color: var(--accent2); }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 48px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+    .upload-zone:hover { border-color: var(--accent); background: rgba(124,58,237,0.05); }
+    .upload-icon { font-size: 40px; margin-bottom: 12px; }
+    .upload-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .upload-sub { font-size: 13px; color: var(--muted); }
+
+    /* Form */
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; }
+    .form-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus { border-color: var(--accent); }
+
+    /* Profile */
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .profile-name { font-size: 17px; font-weight: 700; }
+    .profile-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* Snapshot badge */
+    .snapshot-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.4);
+      color: var(--accent2);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="titlebar">
+    <span class="titlebar-logo">TEVIVE</span>
+    <span class="titlebar-version">0.0.0.1 PHXUAL</span>
+    <div style="flex:1"></div>
+    <span class="snapshot-badge">⚡ SNAPSHOT</span>
+  </div>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-section">Entdecken</div>
+      <div class="nav-item active" onclick="showPage('browse')">
+        <span class="nav-icon">🎮</span> Spiele
+      </div>
+      <div class="nav-item" onclick="showPage('featured')">
+        <span class="nav-icon">⭐</span> Featured
+      </div>
+
+      <div class="sidebar-section" style="margin-top:12px">Bibliothek</div>
+      <div class="nav-item" onclick="showPage('library')">
+        <span class="nav-icon">📚</span> Meine Spiele
+      </div>
+      <div class="nav-item" onclick="showPage('upload')">
+        <span class="nav-icon">⬆️</span> Hochladen
+      </div>
+
+      <div class="sidebar-section" style="margin-top:12px">Konto</div>
+      <div class="nav-item" onclick="showPage('profile')">
+        <span class="nav-icon">👤</span> Profil
+      </div>
+      <div class="nav-item" onclick="showPage('settings')">
+        <span class="nav-icon">⚙️</span> Einstellungen
+      </div>
+
+      <div style="flex:1"></div>
+      <div style="padding:12px 16px;font-size:11px;color:var(--muted)">
+        Tevive 0.0.0.1 PHXUAL<br>
+        <span style="color:#3a3a3a">Free Game Platform</span>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- Browse page -->
+      <div class="page active" id="page-browse">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Spiele entdecken</div>
+            <div class="page-subtitle">Kostenlos spielen & hochladen</div>
+          </div>
+          <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" placeholder="Spiel suchen…" id="search-input" oninput="filterGames()" />
+          </div>
+        </div>
+
+        <div class="section-label">Alle Spiele</div>
+        <div class="game-grid" id="game-grid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- Featured page -->
+      <div class="page" id="page-featured">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Featured</div>
+            <div class="page-subtitle">Top Spiele dieser Woche</div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-value">128</div><div class="stat-label">Spiele verfügbar</div></div>
+          <div class="stat-card"><div class="stat-value">4.2k</div><div class="stat-label">Aktive Spieler</div></div>
+          <div class="stat-card"><div class="stat-value">100%</div><div class="stat-label">Kostenlos</div></div>
+        </div>
+        <div class="section-label">Diese Woche beliebt</div>
+        <div class="game-grid" id="featured-grid"></div>
+      </div>
+
+      <!-- Library page -->
+      <div class="page" id="page-library">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Meine Bibliothek</div>
+            <div class="page-subtitle">Deine heruntergeladenen Spiele</div>
+          </div>
+        </div>
+        <div style="text-align:center;padding:80px 0;color:var(--muted)">
+          <div style="font-size:48px;margin-bottom:16px">📭</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:8px;color:var(--text)">Bibliothek ist leer</div>
+          <div style="font-size:13px">Lade Spiele herunter, um sie hier zu sehen</div>
+        </div>
+      </div>
+
+      <!-- Upload page -->
+      <div class="page" id="page-upload">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Spiel hochladen</div>
+            <div class="page-subtitle">Dein Spiel der Community teilen</div>
+          </div>
+        </div>
+        <div class="upload-zone" onclick="alert('Datei auswählen — in Entwicklung')">
+          <div class="upload-icon">📦</div>
+          <div class="upload-title">EXE oder ZIP hier ablegen</div>
+          <div class="upload-sub">oder klicken zum Durchsuchen · Max 2 GB</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Spielname</label>
+          <input class="form-input" type="text" placeholder="z.B. My Awesome Game" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Beschreibung</label>
+          <input class="form-input" type="text" placeholder="Kurze Beschreibung deines Spiels" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">GitHub Repository (optional)</label>
+          <input class="form-input" type="text" placeholder="https://github.com/user/repo" />
+        </div>
+        <button class="btn btn-primary" onclick="alert('Upload — in Entwicklung')">⬆️ Hochladen</button>
+      </div>
+
+      <!-- Profile page -->
+      <div class="page" id="page-profile">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Profil</div>
+          </div>
+          <button class="btn btn-secondary">✏️ Bearbeiten</button>
+        </div>
+        <div class="profile-card">
+          <div class="avatar">T</div>
+          <div>
+            <div class="profile-name">Tevive User</div>
+            <div class="profile-meta">Mitglied seit 2026 · 0 hochgeladene Spiele</div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Spiele hochgeladen</div></div>
+          <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Downloads gesamt</div></div>
+          <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Bewertungen</div></div>
+        </div>
+      </div>
+
+      <!-- Settings page -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Einstellungen</div>
+          </div>
+        </div>
+        <div class="section-label">App-Info</div>
+        <div class="profile-card">
+          <div style="font-size:36px">⚙️</div>
+          <div>
+            <div class="profile-name">Tevive 0.0.0.1 PHXUAL</div>
+            <div class="profile-meta">Snapshot-Build · Läuft lokal auf diesem PC</div>
+          </div>
+        </div>
+        <div class="section-label">Über</div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;font-size:13px;line-height:1.8;color:var(--muted)">
+          Tevive ist eine kostenlose Spieleplattform. Keine Zahlungen, keine Wallets — nur Gaming.<br>
+          Alle Uploads werden vor der Veröffentlichung auf Malware geprüft.
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const games = [
+      { name: "Pixel Quest", genre: "Platformer", icon: "🕹️", color: "#1a1a2e", rating: 4.5 },
+      { name: "Space Raiders", genre: "Shooter", icon: "🚀", color: "#0d1b2a", rating: 4.2 },
+      { name: "Dragon Run", genre: "Runner", icon: "🐉", color: "#1a0a0a", rating: 4.7 },
+      { name: "Puzzle World", genre: "Puzzle", icon: "🧩", color: "#0a1a0a", rating: 4.3 },
+      { name: "Ninja Dash", genre: "Action", icon: "🥷", color: "#1a1a0a", rating: 4.1 },
+      { name: "Tower Defense X", genre: "Strategy", icon: "🏰", color: "#0a0a1a", rating: 4.6 },
+      { name: "Marble Mayhem", genre: "Arcade", icon: "🔵", color: "#0a1a1a", rating: 4.4 },
+      { name: "Forest Adventure", genre: "RPG", icon: "🌲", color: "#0d1a0a", rating: 4.8 },
+    ];
+
+    function renderGames(list, containerId) {
+      const grid = document.getElementById(containerId);
+      grid.innerHTML = list.map(g => `
+        <div class="game-card" onclick="alert('${g.name} — Download in Entwicklung')">
+          <div class="game-thumb" style="background:${g.color}">${g.icon}</div>
+          <div class="game-info">
+            <div class="game-name">${g.name}</div>
+            <div class="game-meta">
+              <span class="game-tag">${g.genre}</span>
+              <span class="badge-free">FREE</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterGames() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const filtered = games.filter(g => g.name.toLowerCase().includes(q) || g.genre.toLowerCase().includes(q));
+      renderGames(filtered, 'game-grid');
+    }
+
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+      if (name === 'featured') renderGames([...games].sort(() => 0.5 - Math.random()).slice(0, 4), 'featured-grid');
+    }
+
+    renderGames(games, 'game-grid');
+  </script>
+</body>
+</html>
