@@ -1,991 +1,1250 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tevive</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#1b2838;--bg2:#2a475e;--bg3:#1e3248;--bg4:#171a21;
-  --surface:#16202d;--surface2:#1e2d3d;--surface3:#253447;
-  --accent:#1a9fff;--accent2:#66c0f4;--accent3:#4d9ddb;
-  --green:#57cbde;--red:#ff4444;--orange:#e67e22;--yellow:#f1c40f;
-  --text:#c6d4df;--text2:#8ba4c0;--text3:#4f6479;
-  --border:#2a475e;--border2:#1e3248;
-  --card:#16202d;--card-hover:#1e2d3d;
+/* ── Reset & Base ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #0e0e0e;
+  color: #c8c8c8;
+  font-size: 13px;
+  user-select: none;
+  -webkit-app-region: no-drag;
 }
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg4);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-user-select:none}
+input, select, textarea { user-select: text; font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+img { display: block; object-fit: cover; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
 
-/* ── TOP BAR ── */
-.topbar{height:26px;background:#000;display:flex;align-items:center;padding:0 12px;gap:16px;-webkit-app-region:drag;flex-shrink:0;border-bottom:1px solid #000}
-.topbar-brand{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--accent2);-webkit-app-region:no-drag}
-.topbar-nav{display:flex;gap:0;-webkit-app-region:no-drag}
-.topbar-nav a{font-size:11px;color:#888;padding:0 10px;height:26px;display:flex;align-items:center;cursor:pointer;transition:color .15s;border-right:1px solid #1a1a1a}
-.topbar-nav a:hover,.topbar-nav a.active{color:#fff;background:rgba(255,255,255,.07)}
-.topbar-search{flex:1;display:flex;align-items:center;gap:6px;background:#0e1116;border:1px solid #333;border-radius:3px;padding:2px 8px;margin:3px 12px;-webkit-app-region:no-drag}
-.topbar-search input{background:none;border:none;outline:none;color:#ccc;font-size:11px;width:100%}
-.topbar-search input::placeholder{color:#555}
-.topbar-right{display:flex;align-items:center;gap:8px;-webkit-app-region:no-drag;margin-left:auto}
-.topbar-avatar{width:22px;height:22px;border-radius:3px;background:linear-gradient(135deg,var(--accent),#4a90d9);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;cursor:pointer}
-.topbar-username{font-size:11px;color:var(--accent2);cursor:pointer}
+/* ── Variables ── */
+:root {
+  --bg:      #0e0e0e;
+  --bg2:     #141414;
+  --bg3:     #1a1a1a;
+  --surface: #1e1e1e;
+  --surface2:#242424;
+  --surface3:#2c2c2c;
+  --border:  #2a2a2a;
+  --border2: #333;
+  --text:    #e8e8e8;
+  --text2:   #aaa;
+  --text3:   #666;
+  --accent:  #1a9fff;
+  --accent-h:#2aafff;
+  --accent-d:#0d7acc;
+  --green:   #4ade80;
+  --red:     #f87171;
+  --yellow:  #fbbf24;
+}
 
-/* ── MAIN NAV ── */
-.mainnav{height:40px;background:linear-gradient(to bottom,#2a3f5a,#1b2838);display:flex;align-items:stretch;padding:0 16px;flex-shrink:0;border-bottom:2px solid #000}
-.nav-tab{display:flex;align-items:center;gap:7px;padding:0 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.01em}
-.nav-tab:hover{color:var(--text);background:rgba(255,255,255,.06)}
-.nav-tab.active{color:#fff;border-bottom-color:var(--accent2);background:rgba(102,192,244,.07)}
-.nav-tab .tab-icon{font-size:14px}
+/* ── Layout ── */
+.shell { display: flex; flex-direction: column; height: 100vh; }
+.topbar {
+  display: flex; align-items: center; gap: 0;
+  height: 44px; background: #0a0a0a;
+  border-bottom: 1px solid #1a1a1a;
+  flex-shrink: 0; padding: 0 12px;
+  -webkit-app-region: drag;
+}
+.topbar * { -webkit-app-region: no-drag; }
+.topbar-brand {
+  font-size: 14px; font-weight: 900; letter-spacing: 4px;
+  color: #fff; padding-right: 20px; flex-shrink: 0;
+}
+.topbar-brand span { color: var(--accent); }
+.topbar-nav { display: flex; gap: 0; flex-shrink: 0; }
+.topbar-nav a {
+  font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  color: var(--text3); padding: 0 16px; height: 44px;
+  display: flex; align-items: center; text-transform: uppercase;
+  border-bottom: 2px solid transparent; cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.topbar-nav a:hover { color: var(--text); }
+.topbar-nav a.active { color: #fff; border-bottom-color: var(--accent); }
+.topbar-search {
+  flex: 1; max-width: 360px; margin: 0 16px;
+  display: flex; align-items: center; gap: 8px;
+  background: #1a1a1a; border: 1px solid #222;
+  border-radius: 3px; padding: 0 10px; height: 28px;
+}
+.topbar-search input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text); font-size: 12px;
+}
+.topbar-search input::placeholder { color: var(--text3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.topbar-avatar {
+  width: 28px; height: 28px; border-radius: 3px;
+  background: var(--surface3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--text2);
+}
 
-/* ── LAYOUT ── */
-.layout{display:flex;flex:1;overflow:hidden}
-.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border2);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
-.sidebar::-webkit-scrollbar{width:4px}
-.sidebar::-webkit-scrollbar-thumb{background:#2a475e;border-radius:2px}
-.main{flex:1;overflow-y:auto;overflow-x:hidden}
-.main::-webkit-scrollbar{width:6px}
-.main::-webkit-scrollbar-thumb{background:#2a475e;border-radius:3px}
-.main::-webkit-scrollbar-track{background:var(--bg4)}
+.body { display: flex; flex: 1; overflow: hidden; }
 
-/* ── SIDEBAR ── */
-.sidebar-section{padding:10px 14px 4px;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;border-top:1px solid var(--border2);margin-top:4px}
-.sidebar-section:first-child{border-top:none;margin-top:0}
-.sidebar-item{display:flex;align-items:center;gap:10px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;border-left:2px solid transparent}
-.sidebar-item:hover{background:var(--surface2);color:var(--text)}
-.sidebar-item.active{background:var(--surface3);color:#fff;border-left-color:var(--accent2)}
-.sidebar-item .si-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0}
-.sidebar-item .si-badge{margin-left:auto;background:var(--accent);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700}
-.sidebar-item .si-new{margin-left:auto;background:#c43d3d;color:#fff;border-radius:10px;padding:1px 5px;font-size:9px;font-weight:700}
+/* ── Sidebar ── */
+.sidebar {
+  width: 200px; flex-shrink: 0;
+  background: #0a0a0a; border-right: 1px solid #1a1a1a;
+  overflow-y: auto; padding: 8px 0;
+}
+.sidebar-sec {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  color: var(--text3); text-transform: uppercase;
+  padding: 14px 14px 4px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 14px; color: var(--text2); cursor: pointer;
+  font-size: 12px; border-left: 2px solid transparent;
+  transition: background .1s, color .1s;
+}
+.sidebar-item:hover { background: #141414; color: var(--text); }
+.sidebar-item.active { background: #161e2e; color: #fff; border-left-color: var(--accent); }
+.sidebar-item svg { width: 14px; height: 14px; flex-shrink: 0; fill: currentColor; }
+.si-badge {
+  margin-left: auto; font-size: 9px; font-weight: 700;
+  background: var(--accent); color: #fff;
+  padding: 1px 5px; border-radius: 8px;
+}
 
-/* ── PAGES ── */
-.page{display:none;padding:0}
-.page.active{display:block}
+/* ── Main content ── */
+.main { flex: 1; overflow-y: auto; background: var(--bg); }
+.page { display: none; }
+.page.active { display: block; }
 
-/* ── HERO ── */
-.hero{height:320px;position:relative;overflow:hidden;flex-shrink:0}
-.hero-slide{position:absolute;inset:0;display:none}
-.hero-slide.active{display:block}
-.hero-bg{width:100%;height:100%;object-fit:cover;filter:brightness(.7)}
-.hero-gradient{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.85) 0%,rgba(0,0,0,.4) 50%,transparent 100%),linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 60%)}
-.hero-content{position:absolute;bottom:28px;left:28px;max-width:480px}
-.hero-tag{display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:800;letter-spacing:.1em;padding:3px 8px;border-radius:2px;margin-bottom:8px;text-transform:uppercase}
-.hero-title{font-size:28px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:8px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
-.hero-desc{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5}
-.hero-actions{display:flex;gap:10px}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;letter-spacing:.01em}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#1b8fe0}
-.btn-secondary{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25)}
-.btn-secondary:hover{background:rgba(255,255,255,.22)}
-.btn-danger{background:#c43d3d;color:#fff}
-.btn-danger:hover{background:#a83333}
-.btn-sm{padding:6px 14px;font-size:12px}
-.btn-xs{padding:4px 10px;font-size:11px}
-.hero-dots{position:absolute;bottom:12px;right:20px;display:flex;gap:6px}
-.hero-dot{width:24px;height:3px;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;transition:all .2s}
-.hero-dot.active{background:var(--accent2);width:32px}
-.hero-thumbnails{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px}
-.hero-thumb{width:100px;height:64px;border-radius:4px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;opacity:.7}
-.hero-thumb.active{border-color:var(--accent2);opacity:1}
-.hero-thumb-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px}
+/* ── Sections ── */
+.section { padding: 16px 20px 0; }
+.section-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-title { font-size: 14px; font-weight: 700; color: #fff; }
+.section-more { font-size: 11px; color: var(--accent); cursor: pointer; }
+.section-more:hover { color: var(--accent-h); }
 
-/* ── SECTION ── */
-.section{padding:20px 20px 0}
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.section-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:.02em}
-.section-title span{color:var(--text3);font-weight:400;font-size:12px;margin-left:8px}
-.section-more{font-size:11px;color:var(--accent2);cursor:pointer;transition:color .15s}
-.section-more:hover{color:#fff}
+/* ── Game Cards ── */
+.game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.game-card {
+  background: var(--surface); border-radius: 3px; overflow: hidden;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: border-color .15s, transform .1s;
+}
+.game-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.game-thumb {
+  width: 100%; aspect-ratio: 16/9; background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.game-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.game-thumb-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--text3); font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; background: linear-gradient(135deg, #141414, #1e1e1e);
+}
+.game-info { padding: 8px 10px 10px; }
+.game-title { font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.game-meta { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.game-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.game-tag {
+  font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 2px;
+  background: var(--surface3); color: var(--text2); border: 1px solid var(--border);
+}
+.game-scan-badge {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 2px;
+}
+.badge-clean { background: rgba(74,222,128,.15); color: var(--green); border: 1px solid rgba(74,222,128,.3); }
+.badge-threat { background: rgba(248,113,113,.15); color: var(--red); border: 1px solid rgba(248,113,113,.3); }
+.badge-scanning { background: rgba(26,159,255,.15); color: var(--accent); border: 1px solid rgba(26,159,255,.3); }
+.badge-pending { background: rgba(251,191,36,.1); color: var(--yellow); border: 1px solid rgba(251,191,36,.25); }
 
-/* ── GAME CARDS ── */
-.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:20px}
-.game-card{background:var(--card);border-radius:4px;overflow:hidden;cursor:pointer;transition:all .2s;border:1px solid transparent}
-.game-card:hover{border-color:var(--accent3);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.game-thumb{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden}
-.game-thumb-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:42px;transition:transform .3s}
-.game-card:hover .game-thumb-bg{transform:scale(1.06)}
-.game-scan-badge{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.75);border-radius:10px;padding:2px 7px;font-size:9px;font-weight:700;display:flex;align-items:center;gap:3px}
-.scan-clean{color:#4ade80}
-.scan-pending{color:#facc15}
-.scan-danger{color:#f87171}
-.game-info{padding:10px}
-.game-name{font-size:12px;font-weight:700;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.game-meta{display:flex;align-items:center;justify-content:space-between}
-.game-genre{font-size:10px;color:var(--text3);background:var(--surface3);border-radius:2px;padding:1px 5px}
-.game-rating{font-size:10px;color:var(--accent2)}
-.game-size{font-size:10px;color:var(--text3)}
-.game-free{font-size:10px;color:#4ade80;font-weight:700}
+/* ── Empty state ── */
+.empty {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 40px; gap: 12px;
+}
+.empty svg { width: 48px; height: 48px; fill: var(--surface3); }
+.empty-title { font-size: 16px; font-weight: 700; color: var(--text2); }
+.empty-sub { font-size: 12px; color: var(--text3); text-align: center; max-width: 320px; line-height: 1.6; }
 
-/* ── LARGE CARDS ── */
-.game-grid-lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px}
-.game-card-lg{display:flex;gap:10px;background:var(--card);border-radius:4px;padding:10px;cursor:pointer;transition:all .2s;border:1px solid transparent}
-.game-card-lg:hover{border-color:var(--border);background:var(--card-hover)}
-.game-card-lg .thumb{width:80px;height:50px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px}
-.game-card-lg .info{flex:1;min-width:0}
-.game-card-lg .name{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.game-card-lg .meta{font-size:10px;color:var(--text3);margin-bottom:4px}
-.game-card-lg .tags{display:flex;gap:4px;flex-wrap:wrap}
-.game-tag{font-size:9px;background:var(--surface3);color:var(--text2);padding:1px 5px;border-radius:2px}
+/* ── Forms / Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 7px 18px; border-radius: 3px; font-size: 12px; font-weight: 600;
+  transition: background .15s, opacity .15s; cursor: pointer; border: none;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-h); }
+.btn-primary:active { background: var(--accent-d); }
+.btn-secondary { background: var(--surface3); color: var(--text); border: 1px solid var(--border2); }
+.btn-secondary:hover { background: #333; }
+.btn-danger { background: rgba(248,113,113,.15); color: var(--red); border: 1px solid rgba(248,113,113,.3); }
+.btn-danger:hover { background: rgba(248,113,113,.25); }
+.btn-sm { padding: 4px 12px; font-size: 11px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
 
-/* ── SCAN PANEL ── */
-.scan-panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px;margin:20px}
-.scan-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.scan-icon{font-size:32px}
-.scan-title{font-size:18px;font-weight:800;color:#fff}
-.scan-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.scan-dropzone{border:2px dashed var(--border);border-radius:6px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px}
-.scan-dropzone:hover,.scan-dropzone.drag{border-color:var(--accent);background:rgba(26,159,255,.06)}
-.scan-dropzone-icon{font-size:36px;margin-bottom:8px}
-.scan-dropzone-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
-.scan-dropzone-sub{font-size:12px;color:var(--text2)}
-.scan-progress{background:var(--surface2);border-radius:6px;padding:16px;margin-bottom:12px}
-.progress-bar-wrap{background:var(--surface3);border-radius:10px;height:6px;margin:10px 0}
-.progress-bar{height:6px;border-radius:10px;background:linear-gradient(to right,var(--accent),var(--green));transition:width .3s}
-.scan-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.scan-check{display:flex;align-items:center;gap:8px;background:var(--surface3);border-radius:4px;padding:8px 12px;font-size:12px}
-.check-icon{font-size:14px;width:20px;text-align:center}
-.check-label{flex:1;color:var(--text2)}
-.check-status{font-size:10px;font-weight:700}
-.check-ok{color:#4ade80}
-.check-scanning{color:var(--yellow)}
-.check-pending{color:var(--text3)}
-.check-danger{color:var(--red)}
-.scan-result{display:flex;align-items:center;gap:14px;padding:16px;border-radius:6px;margin-bottom:12px}
-.scan-result.clean{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3)}
-.scan-result.danger{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3)}
-.scan-result.pending{background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.2)}
-.scan-result .result-icon{font-size:32px}
-.scan-result .result-text .rt{font-size:15px;font-weight:800}
-.scan-result .result-text .rs{font-size:12px;color:var(--text2);margin-top:2px}
-.scan-history{background:var(--surface2);border-radius:6px;overflow:hidden}
-.scan-history-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border2);font-size:12px}
-.scan-history-item:last-child{border-bottom:none}
-.shi-name{flex:1;color:var(--text);font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.shi-date{color:var(--text3);font-size:11px}
-.shi-result{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
-.shi-clean{background:rgba(74,222,128,.15);color:#4ade80}
-.shi-danger{background:rgba(248,113,113,.15);color:#f87171}
+.form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; }
+.form-input, .form-select, .form-textarea {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 3px; color: var(--text); padding: 8px 10px;
+  font-size: 12px; outline: none; transition: border-color .15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-select { cursor: pointer; }
+.form-select option { background: var(--bg3); }
+.form-hint { font-size: 10px; color: var(--text3); }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
 
-/* ── LIBRARY ── */
-.library-item{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .15s}
-.library-item:hover{background:var(--surface2)}
-.lib-thumb{width:60px;height:38px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.lib-info{flex:1;min-width:0}
-.lib-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
-.lib-meta{font-size:11px;color:var(--text3)}
-.lib-actions{display:flex;gap:8px}
-.lib-play{background:var(--accent);color:#fff;border:none;border-radius:3px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
-.lib-play:hover{background:#1b8fe0}
-.lib-opts{background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:3px;padding:6px 10px;font-size:12px;cursor:pointer}
+/* ── Tabs ── */
+.tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; }
+.tab {
+  font-size: 12px; font-weight: 600; color: var(--text3);
+  padding: 10px 16px; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: #fff; border-bottom-color: var(--accent); }
 
-/* ── NEWS ── */
-.news-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px}
-.news-main{background:var(--card);border-radius:4px;overflow:hidden;cursor:pointer;transition:all .2s}
-.news-main:hover{border:1px solid var(--border)}
-.news-thumb-lg{height:160px;display:flex;align-items:center;justify-content:center;font-size:60px}
-.news-body{padding:14px}
-.news-category{font-size:10px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
-.news-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.3}
-.news-excerpt{font-size:12px;color:var(--text2);line-height:1.5}
-.news-date{font-size:11px;color:var(--text3);margin-top:8px}
-.news-list{display:flex;flex-direction:column;gap:8px}
-.news-item{background:var(--card);border-radius:4px;padding:10px;cursor:pointer;transition:all .15s;display:flex;gap:10px}
-.news-item:hover{background:var(--card-hover)}
-.news-item-thumb{width:60px;height:40px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.news-item-body .nt{font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;line-height:1.3}
-.news-item-body .nd{font-size:10px;color:var(--text3)}
+/* ── Download items ── */
+.dl-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.dl-item:hover { background: var(--surface); }
+.dl-thumb { width: 44px; height: 28px; border-radius: 2px; background: var(--surface2); overflow: hidden; flex-shrink: 0; }
+.dl-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.dl-info { flex: 1; min-width: 0; }
+.dl-name { font-size: 12px; font-weight: 700; color: #fff; }
+.dl-stats { font-size: 10px; color: var(--text3); margin-top: 3px; }
+.dl-bar-wrap { width: 140px; background: var(--surface3); border-radius: 8px; height: 3px; flex-shrink: 0; }
+.dl-bar { height: 3px; border-radius: 8px; background: var(--accent); transition: width .4s linear; }
+.dl-pct { font-size: 11px; color: var(--text2); width: 38px; text-align: right; flex-shrink: 0; }
+.dl-actions { flex-shrink: 0; }
 
-/* ── UPLOAD ── */
-.upload-form{max-width:640px;padding:20px}
-.form-group{margin-bottom:16px}
-.form-label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.form-label .required{color:var(--accent);font-size:9px}
-.form-input,.form-select,.form-textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;transition:border-color .15s;font-family:inherit}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent3)}
-.form-textarea{height:90px;resize:vertical}
-.form-select{cursor:pointer}
-.form-hint{font-size:11px;color:var(--text3);margin-top:4px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.upload-dropzone{border:2px dashed var(--border);border-radius:6px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:6px}
-.upload-dropzone:hover{border-color:var(--accent);background:rgba(26,159,255,.05)}
-.scan-notice{background:rgba(26,159,255,.1);border:1px solid rgba(26,159,255,.3);border-radius:4px;padding:10px 14px;font-size:12px;color:var(--accent2);display:flex;align-items:center;gap:8px;margin-bottom:16px}
+/* ── Scanner ── */
+.scan-panel { padding: 20px; max-width: 680px; }
+.scan-zone {
+  border: 1px dashed var(--border2); border-radius: 4px;
+  padding: 40px; text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.scan-zone:hover, .scan-zone.drag { border-color: var(--accent); background: rgba(26,159,255,.05); }
+.scan-zone-icon { width: 36px; height: 36px; fill: var(--text3); margin: 0 auto 12px; }
+.scan-zone-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.scan-zone-sub { font-size: 11px; color: var(--text3); }
+.scan-progress-wrap { margin: 16px 0; }
+.scan-bar-outer { background: var(--surface2); border-radius: 8px; height: 4px; overflow: hidden; }
+.scan-bar-inner { height: 4px; background: var(--accent); border-radius: 8px; transition: width .3s; }
+.scan-step-label { font-size: 11px; color: var(--text2); margin-top: 6px; }
+.checks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 14px; }
+.check-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 3px;
+  padding: 8px 10px;
+}
+.check-item.ok { border-color: rgba(74,222,128,.3); background: rgba(74,222,128,.05); }
+.check-item.threat { border-color: rgba(248,113,113,.3); background: rgba(248,113,113,.05); }
+.check-icon { width: 14px; height: 14px; flex-shrink: 0; fill: var(--text3); }
+.check-item.ok .check-icon { fill: var(--green); }
+.check-item.threat .check-icon { fill: var(--red); }
+.check-label { font-size: 11px; color: var(--text2); flex: 1; }
+.check-status { font-size: 10px; font-weight: 700; }
+.check-status.pending { color: var(--text3); }
+.check-status.ok { color: var(--green); }
+.check-status.threat { color: var(--red); }
 
-/* ── PROFILE / STATS ── */
-.profile-hero{background:linear-gradient(to bottom,var(--bg2),var(--surface));padding:24px;display:flex;gap:20px;align-items:flex-end;border-bottom:1px solid var(--border2)}
-.profile-avatar-lg{width:80px;height:80px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#3a6ea8);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,.4)}
-.profile-info .pname{font-size:22px;font-weight:800;color:#fff}
-.profile-info .pmeta{font-size:12px;color:var(--text2);margin-top:3px}
-.profile-info .pbadges{display:flex;gap:8px;margin-top:8px}
-.pbadge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px}
-.pbadge-dev{background:rgba(26,159,255,.2);color:var(--accent2);border:1px solid rgba(26,159,255,.4)}
-.pbadge-snap{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px}
-.stat-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:14px;text-align:center}
-.stat-val{font-size:24px;font-weight:900;color:var(--accent2)}
-.stat-lbl{font-size:11px;color:var(--text3);margin-top:2px}
+.scan-result {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 3px; border: 1px solid; margin: 14px 0;
+}
+.scan-result.clean { background: rgba(74,222,128,.07); border-color: rgba(74,222,128,.3); }
+.scan-result.threat { background: rgba(248,113,113,.07); border-color: rgba(248,113,113,.3); }
+.scan-result-icon { width: 20px; height: 20px; fill: currentColor; flex-shrink: 0; }
+.scan-result.clean .scan-result-icon { color: var(--green); }
+.scan-result.threat .scan-result-icon { color: var(--red); }
+.scan-result-body { flex: 1; }
+.scan-result-title { font-size: 14px; font-weight: 700; }
+.scan-result.clean .scan-result-title { color: var(--green); }
+.scan-result.threat .scan-result-title { color: var(--red); }
+.scan-result-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.threat-list { margin-top: 6px; }
+.threat-item { font-size: 11px; color: var(--red); background: rgba(248,113,113,.08); padding: 2px 8px; border-radius: 2px; display: inline-block; margin: 2px 2px 0 0; }
 
-/* ── ACHIEVEMENTS ── */
-.achiev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:0 20px 20px}
-.achiev-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:12px;display:flex;gap:10px;align-items:center}
-.achiev-card.locked{opacity:.5;filter:grayscale(.8)}
-.achiev-icon{font-size:28px;width:36px;text-align:center;flex-shrink:0}
-.achiev-info .aname{font-size:12px;font-weight:700;color:#fff}
-.achiev-info .adesc{font-size:10px;color:var(--text3);margin-top:2px}
-.achiev-info .aprog{font-size:10px;color:var(--accent2);margin-top:4px}
+.history-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.history-status { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.history-status.clean { background: var(--green); }
+.history-status.threat { background: var(--red); }
+.history-status.scanning { background: var(--accent); }
+.history-name { flex: 1; font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-date { font-size: 10px; color: var(--text3); flex-shrink: 0; }
+.history-engine { font-size: 9px; color: var(--text3); flex-shrink: 0; }
+.history-badge { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 2px; flex-shrink: 0; }
+.history-badge.clean { background: rgba(74,222,128,.1); color: var(--green); }
+.history-badge.threat { background: rgba(248,113,113,.1); color: var(--red); }
 
-/* ── TOAST ── */
-.toast-container{position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:9999}
-.toast{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 14px;font-size:12px;color:#fff;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.4);animation:slide-in .2s ease;max-width:280px}
-.toast.success{border-left:3px solid #4ade80}
-.toast.error{border-left:3px solid #f87171}
-.toast.info{border-left:3px solid var(--accent2)}
-@keyframes slide-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+/* ── Game Detail Modal ── */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.7); z-index: 100;
+  align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 4px; width: 680px; max-height: 85vh;
+  overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,.6);
+}
+.modal-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 16px; font-weight: 700; color: #fff; }
+.modal-close {
+  width: 24px; height: 24px; background: var(--surface2); border: none;
+  border-radius: 3px; color: var(--text2); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--surface3); color: #fff; }
+.modal-body { padding: 20px; }
+.modal-hero { width: 100%; aspect-ratio: 16/7; background: var(--surface); border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+.modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+.modal-hero-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text3); font-weight: 700; letter-spacing: 2px; background: linear-gradient(135deg, #141414, #1c1c1c); }
+.modal-desc { font-size: 12px; line-height: 1.7; color: var(--text2); margin: 10px 0 16px; }
+.modal-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.meta-item { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 10px 12px; }
+.meta-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
+.meta-value { font-size: 12px; font-weight: 600; color: #fff; }
+.modal-actions { display: flex; gap: 8px; }
 
-/* ── MISC ── */
-.tag-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.tag-btn{font-size:11px;padding:4px 12px;border-radius:12px;border:1px solid var(--border);color:var(--text2);background:transparent;cursor:pointer;transition:all .15s}
-.tag-btn:hover,.tag-btn.active{background:var(--accent3);color:#fff;border-color:var(--accent3)}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
-.empty-state .ei{font-size:48px;margin-bottom:12px}
-.empty-state .et{font-size:16px;font-weight:700;color:var(--text2);margin-bottom:6px}
-.empty-state .es{font-size:13px}
-.dl-progress{background:var(--surface2);border-radius:4px;padding:12px 16px;margin:0 20px 10px;display:flex;align-items:center;gap:12px}
-.dl-progress .dp-name{font-size:12px;font-weight:700;color:#fff;flex:1}
-.dl-progress .dp-size{font-size:11px;color:var(--text3);margin-right:8px}
-.dl-bar-wrap{width:120px;background:var(--surface3);border-radius:10px;height:4px}
-.dl-bar{height:4px;border-radius:10px;background:var(--accent);transition:width .5s}
-.dl-cancel{font-size:11px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:2px}
-.dl-cancel:hover{background:var(--surface3);color:var(--red)}
+/* ── Upload form ── */
+.upload-panel { padding: 20px; max-width: 600px; }
+.upload-thumb-preview {
+  width: 200px; height: 112px; border: 1px solid var(--border); border-radius: 3px;
+  background: var(--surface); overflow: hidden; margin-bottom: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.upload-thumb-preview img { width: 100%; height: 100%; object-fit: cover; }
+.upload-thumb-placeholder { font-size: 11px; color: var(--text3); text-align: center; padding: 8px; }
+
+/* ── Progress bar generic ── */
+.prog-wrap { background: var(--surface2); border-radius: 8px; height: 4px; overflow: hidden; }
+.prog-bar { height: 4px; border-radius: 8px; background: var(--accent); transition: width .3s; }
+
+/* ── Toast ── */
+.toast-wrap { position: fixed; bottom: 16px; right: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 9999; pointer-events: none; }
+.toast {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 3px; padding: 9px 14px; font-size: 12px; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  animation: toast-in .2s ease; max-width: 300px;
+  pointer-events: all;
+}
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--accent); }
+@keyframes toast-in { from { opacity:0; transform:translateX(12px); } to { opacity:1; transform:translateX(0); } }
+
+/* ── URL resolver ── */
+.resolver-status { font-size: 11px; color: var(--text2); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+.resolver-status.ok { color: var(--green); }
+.resolver-status.error { color: var(--red); }
+.resolver-status.loading { color: var(--accent); }
+
+/* ── Dots loader ── */
+.dots::after { content: ''; animation: dots 1.2s infinite; }
+@keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+
+/* ── Browse filters ── */
+.browse-filters { display: flex; gap: 8px; padding: 12px 20px 0; flex-wrap: wrap; align-items: center; }
+.filter-chip {
+  font-size: 11px; padding: 3px 12px; border-radius: 12px;
+  border: 1px solid var(--border); color: var(--text2);
+  background: transparent; cursor: pointer; transition: all .15s;
+}
+.filter-chip:hover { border-color: var(--border2); color: var(--text); }
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <span class="topbar-brand">TEVIVE</span>
-  <div class="topbar-nav">
-    <a class="active" onclick="setTopNav(this,'store')">STORE</a>
-    <a onclick="setTopNav(this,'library')">BIBLIOTHEK</a>
-    <a onclick="setTopNav(this,'community')">COMMUNITY</a>
-  </div>
-  <div class="topbar-search">
-    <span style="color:#555;font-size:12px">🔍</span>
-    <input type="text" placeholder="Ein Spiel suchen…" id="global-search" oninput="onGlobalSearch(this.value)"/>
-  </div>
-  <div class="topbar-right">
-    <span class="topbar-avatar">T</span>
-    <span class="topbar-username">TeviveUser</span>
-  </div>
-</div>
+<div class="shell">
 
-<!-- MAIN NAV -->
-<div class="mainnav" id="mainnav-store">
-  <div class="nav-tab active" onclick="showPage('store-home',this)"><span class="tab-icon">🏠</span>Shop</div>
-  <div class="nav-tab" onclick="showPage('store-browse',this)"><span class="tab-icon">🎮</span>Alle Spiele</div>
-  <div class="nav-tab" onclick="showPage('scanner',this)"><span class="tab-icon">🛡️</span>Virenscanner</div>
-  <div class="nav-tab" onclick="showPage('news',this)"><span class="tab-icon">📰</span>News</div>
-  <div class="nav-tab" onclick="showPage('upload',this)"><span class="tab-icon">⬆️</span>Hochladen</div>
-  <div class="nav-tab" onclick="showPage('profile',this)"><span class="tab-icon">👤</span>Profil</div>
-</div>
-<div class="mainnav" id="mainnav-library" style="display:none">
-  <div class="nav-tab active" onclick="showPage('library-home',this)"><span class="tab-icon">📚</span>Spiele</div>
-  <div class="nav-tab" onclick="showPage('downloads',this)"><span class="tab-icon">⬇️</span>Downloads</div>
-  <div class="nav-tab" onclick="showPage('achievements',this)"><span class="tab-icon">🏆</span>Erfolge</div>
-</div>
-
-<!-- LAYOUT -->
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-section">Entdecken</div>
-    <div class="sidebar-item active" onclick="sidebarClick(this,'store-home')"><span class="si-icon">🏠</span>Shop</div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'store-browse')"><span class="si-icon">🎮</span>Alle Spiele</div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'scanner')"><span class="si-icon">🛡️</span>Virenscanner <span class="si-badge">NEU</span></div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'news')"><span class="si-icon">📰</span>News</div>
-
-    <div class="sidebar-section">Kategorien</div>
-    <div class="sidebar-item" onclick="filterCategory('Action')"><span class="si-icon">⚔️</span>Action</div>
-    <div class="sidebar-item" onclick="filterCategory('RPG')"><span class="si-icon">🧙</span>RPG</div>
-    <div class="sidebar-item" onclick="filterCategory('Puzzle')"><span class="si-icon">🧩</span>Puzzle</div>
-    <div class="sidebar-item" onclick="filterCategory('Shooter')"><span class="si-icon">🔫</span>Shooter</div>
-    <div class="sidebar-item" onclick="filterCategory('Strategy')"><span class="si-icon">♟️</span>Strategie</div>
-    <div class="sidebar-item" onclick="filterCategory('Platformer')"><span class="si-icon">🏃</span>Platformer</div>
-    <div class="sidebar-item" onclick="filterCategory('Horror')"><span class="si-icon">👻</span>Horror</div>
-    <div class="sidebar-item" onclick="filterCategory('Racing')"><span class="si-icon">🏎️</span>Racing</div>
-
-    <div class="sidebar-section">Meine Sachen</div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'library-home')"><span class="si-icon">📚</span>Bibliothek</div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'downloads')"><span class="si-icon">⬇️</span>Downloads <span class="si-new">1</span></div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'achievements')"><span class="si-icon">🏆</span>Erfolge</div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'upload')"><span class="si-icon">⬆️</span>Hochladen</div>
-    <div class="sidebar-item" onclick="sidebarClick(this,'profile')"><span class="si-icon">👤</span>Profil</div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">TEV<span>I</span>VE</div>
+    <div class="topbar-nav">
+      <a class="active" onclick="topNav(this,'store')">STORE</a>
+      <a onclick="topNav(this,'library')">BIBLIOTHEK</a>
+    </div>
+    <div class="topbar-search">
+      <svg viewBox="0 0 16 16" width="12" height="12" fill="#555"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85.707-.707-3.85-3.85zm-5.242 1.156a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+      <input type="text" placeholder="Spiele durchsuchen…" id="global-search" oninput="globalSearch(this.value)"/>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-avatar">T</div>
+    </div>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="main" id="main-content">
+  <div class="body">
 
-    <!-- ======== STORE HOME ======== -->
-    <div class="page active" id="page-store-home">
-      <!-- Hero -->
-      <div class="hero">
-        <div class="hero-slide active" id="slide-0">
-          <div class="hero-bg" style="background:linear-gradient(135deg,#0d1b2a,#1a3a5c,#0a2340);width:100%;height:100%"></div>
-          <div class="hero-gradient"></div>
-          <div class="hero-content">
-            <span class="hero-tag">⚡ FEATURED</span>
-            <div class="hero-title">Dragon's Descent</div>
-            <div class="hero-desc">Erlebe ein episches Open-World RPG — völlig kostenlos, kein DRM, kein Wallet. Erkunde eine riesige Welt voller Abenteuer.</div>
-            <div class="hero-actions">
-              <button class="btn btn-primary" onclick="startDownload('Dragon\'s Descent','1.8 GB')">⬇ Jetzt herunterladen</button>
-              <button class="btn btn-secondary" onclick="showGameDetail('Dragon\'s Descent')">Mehr erfahren</button>
-            </div>
-          </div>
-        </div>
-        <div class="hero-slide" id="slide-1">
-          <div class="hero-bg" style="background:linear-gradient(135deg,#1a0a2e,#3d1a6e,#1a0a40);width:100%;height:100%"></div>
-          <div class="hero-gradient"></div>
-          <div class="hero-content">
-            <span class="hero-tag">🆕 NEU</span>
-            <div class="hero-title">Void Runners</div>
-            <div class="hero-desc">Schneller Sci-Fi Shooter mit Roguelike-Elementen. Jeder Run ist anders — keine zwei Spiele sind gleich.</div>
-            <div class="hero-actions">
-              <button class="btn btn-primary" onclick="startDownload('Void Runners','680 MB')">⬇ Jetzt herunterladen</button>
-              <button class="btn btn-secondary">Mehr erfahren</button>
-            </div>
-          </div>
-        </div>
-        <div class="hero-slide" id="slide-2">
-          <div class="hero-bg" style="background:linear-gradient(135deg,#0a1a0a,#1a3d1a,#0a2e0a);width:100%;height:100%"></div>
-          <div class="hero-gradient"></div>
-          <div class="hero-content">
-            <span class="hero-tag">🏆 TOP BEWERTET</span>
-            <div class="hero-title">Forest Survival X</div>
-            <div class="hero-desc">Survival-Crafting in einer proceduralen Welt. Baue, erforsche, überlebe. Community-Liebling seit Tag 1.</div>
-            <div class="hero-actions">
-              <button class="btn btn-primary" onclick="startDownload('Forest Survival X','2.4 GB')">⬇ Jetzt herunterladen</button>
-              <button class="btn btn-secondary">Mehr erfahren</button>
-            </div>
-          </div>
-        </div>
-        <div class="hero-thumbnails">
-          <div class="hero-thumb active" onclick="goSlide(0)"><div class="hero-thumb-bg" style="background:#0d1b2a">🐉</div></div>
-          <div class="hero-thumb" onclick="goSlide(1)"><div class="hero-thumb-bg" style="background:#1a0a2e">🚀</div></div>
-          <div class="hero-thumb" onclick="goSlide(2)"><div class="hero-thumb-bg" style="background:#0a1a0a">🌲</div></div>
-        </div>
-        <div class="hero-dots">
-          <div class="hero-dot active" onclick="goSlide(0)"></div>
-          <div class="hero-dot" onclick="goSlide(1)"></div>
-          <div class="hero-dot" onclick="goSlide(2)"></div>
-        </div>
-      </div>
-
-      <!-- Downloads in Progress -->
-      <div id="dl-section" style="padding-top:12px;display:none">
-        <div class="section"><div class="section-header"><span class="section-title">Downloads ⬇️</span></div></div>
-        <div id="dl-list"></div>
-      </div>
-
-      <!-- Featured -->
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">🔥 Beliebt diese Woche</span>
-          <span class="section-more" onclick="sidebarClick(null,'store-browse')">Alle anzeigen →</span>
-        </div>
-        <div class="game-grid" id="grid-popular"></div>
-      </div>
-
-      <!-- New releases -->
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">🆕 Neue Veröffentlichungen</span>
-          <span class="section-more" onclick="sidebarClick(null,'store-browse')">Alle anzeigen →</span>
-        </div>
-        <div class="game-grid" id="grid-new"></div>
-      </div>
-
-      <!-- Top rated -->
-      <div class="section" style="padding-bottom:24px">
-        <div class="section-header">
-          <span class="section-title">⭐ Top bewertet</span>
-        </div>
-        <div class="game-grid-lg" id="grid-top"></div>
-      </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <!-- store nav injected by JS -->
     </div>
 
-    <!-- ======== STORE BROWSE ======== -->
-    <div class="page" id="page-store-browse">
-      <div style="padding:20px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="font-size:18px;font-weight:800;color:#fff">Alle Spiele <span style="font-size:13px;color:var(--text3);font-weight:400" id="browse-count"></span></div>
+    <!-- MAIN -->
+    <div class="main" id="main">
+
+      <!-- ====== STORE HOME ====== -->
+      <div class="page active" id="page-store-home">
+        <div class="section">
+          <div class="section-hdr">
+            <span class="section-title">Beliebt</span>
+            <span class="section-more" onclick="showPage('store-browse')">Alle anzeigen</span>
+          </div>
+          <div class="game-grid" id="grid-popular"></div>
+        </div>
+        <div class="section" style="padding-top:20px">
+          <div class="section-hdr">
+            <span class="section-title">Zuletzt hinzugefügt</span>
+          </div>
+          <div class="game-grid" id="grid-recent"></div>
+        </div>
+        <div style="padding:24px 20px 0">
+          <div id="home-empty" style="display:none">
+            <div class="empty">
+              <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36 0-2.58-2.09-4.64-4.64-4.64-1.56 0-2.94.79-3.79 1.97L8 3.9 6.43 1.97C5.58.79 4.2 0 2.64 0 .09 0-2 2.06-2 4.64c0 .48.11.92.18 1.36H-2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h22c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7.82-3.6c.54-.66 1.36-1.04 2.18-1.04 1.55 0 2.64 1.25 2.64 2.64 0 .48-.11.92-.23 1.36h-5.47l.88-2.96zM4.18 4.64C4.18 3.25 5.27 2 6.82 2c.82 0 1.64.38 2.18 1.04l.88 2.96H4.41c-.12-.44-.23-.88-.23-1.36zM20 20H2V8h18v12z"/></svg>
+              <div class="empty-title">Noch keine Spiele</div>
+              <div class="empty-sub">Füge dein erstes Spiel hinzu — über eine Datei oder einen GitHub-Release-Link.</div>
+              <button class="btn btn-primary" style="margin-top:8px" onclick="showPage('upload')">Spiel hinzufügen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== STORE BROWSE ====== -->
+      <div class="page" id="page-store-browse">
+        <div style="padding:16px 20px 0; display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-size:16px;font-weight:700;color:#fff">
+            Alle Spiele <span style="font-size:12px;color:var(--text3);font-weight:400" id="browse-count"></span>
+          </div>
           <div style="display:flex;gap:8px">
-            <input type="text" class="form-input" style="width:200px;padding:6px 10px;font-size:12px" placeholder="🔍 Suchen…" id="browse-search" oninput="renderBrowse()"/>
-            <select class="form-select" style="width:130px;padding:6px 10px;font-size:12px" id="browse-sort" onchange="renderBrowse()">
-              <option>Beliebtheit</option>
-              <option>Neu zuerst</option>
-              <option>Name A-Z</option>
-              <option>Größe ↑</option>
+            <input type="text" class="form-input" style="width:200px;padding:5px 10px;font-size:12px" placeholder="Suchen…" id="browse-search" oninput="renderBrowse()"/>
+            <select class="form-select" style="width:140px;padding:5px 10px;font-size:12px" id="browse-sort" onchange="renderBrowse()">
+              <option value="recent">Neueste zuerst</option>
+              <option value="name">Name A-Z</option>
             </select>
           </div>
         </div>
-        <div class="tag-filter" id="browse-tags"></div>
-        <div class="game-grid" id="grid-browse"></div>
-      </div>
-    </div>
-
-    <!-- ======== VIRUS SCANNER ======== -->
-    <div class="page" id="page-scanner">
-      <div class="scan-panel">
-        <div class="scan-header">
-          <span class="scan-icon">🛡️</span>
-          <div>
-            <div class="scan-title">Tevive Virenscanner</div>
-            <div class="scan-sub">Lade eine EXE oder ZIP-Datei hoch — 8 Sicherheitschecks, direkt auf deinem PC</div>
+        <div class="browse-filters" id="browse-filters"></div>
+        <div style="padding:12px 20px"><div class="game-grid" id="grid-browse"></div></div>
+        <div id="browse-empty" style="display:none">
+          <div class="empty">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <div class="empty-title">Keine Ergebnisse</div>
+            <div class="empty-sub">Versuche einen anderen Suchbegriff oder eine andere Kategorie.</div>
           </div>
         </div>
+      </div>
 
-        <div class="scan-dropzone" id="scan-drop" onclick="startScan()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleScanDrop(event)">
-          <div class="scan-dropzone-icon">📁</div>
-          <div class="scan-dropzone-title">Datei hier ablegen oder klicken</div>
-          <div class="scan-dropzone-sub">EXE, ZIP, RAR, MSI · Max 2 GB · Wird nicht hochgeladen</div>
+      <!-- ====== LIBRARY ====== -->
+      <div class="page" id="page-library">
+        <div class="section">
+          <div class="section-hdr"><span class="section-title">Installierte Spiele</span></div>
+          <div class="game-grid" id="grid-library"></div>
+          <div id="library-empty" style="display:none">
+            <div class="empty">
+              <svg viewBox="0 0 24 24"><path d="M4 6h18V4H4c-1.1 0-2 .9-2 2v13H0v3h14v-3H4V6zm20 2h-8c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h8c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zm-1 9h-6v-7h6v7z"/></svg>
+              <div class="empty-title">Keine installierten Spiele</div>
+              <div class="empty-sub">Lade ein Spiel herunter, um es hier zu sehen.</div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div id="scan-running" style="display:none">
-          <div class="scan-progress">
+      <!-- ====== DOWNLOADS ====== -->
+      <div class="page" id="page-downloads">
+        <div style="padding:16px 20px 0">
+          <div class="section-hdr"><span class="section-title">Downloads</span></div>
+        </div>
+        <div id="dl-list"></div>
+        <div id="dl-empty" style="display:none">
+          <div class="empty">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <div class="empty-title">Keine aktiven Downloads</div>
+            <div class="empty-sub">Starte einen Download aus dem Store, er erscheint hier.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== SCANNER ====== -->
+      <div class="page" id="page-scanner">
+        <div class="scan-panel">
+          <div style="margin-bottom:16px">
+            <div class="section-title" style="margin-bottom:4px">Virenscanner</div>
+            <div style="font-size:11px;color:var(--text3)">Scannt EXE, ZIP, RAR, MSI — vollständig lokal auf deinem PC, keine Daten werden hochgeladen</div>
+          </div>
+
+          <div class="scan-zone" id="scan-zone"
+            onclick="pickAndScan()"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="handleDrop(event)">
+            <svg class="scan-zone-icon" viewBox="0 0 24 24"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"/></svg>
+            <div class="scan-zone-title">Datei auswählen oder hier ablegen</div>
+            <div class="scan-zone-sub">EXE · ZIP · RAR · MSI · 7Z — Kein Datei-Größenlimit — Wird nur lokal analysiert</div>
+          </div>
+
+          <div id="scan-running" style="display:none;margin-top:14px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-              <span style="font-size:13px;font-weight:700;color:#fff" id="scan-filename">Datei.exe</span>
-              <span style="font-size:11px;color:var(--text3)" id="scan-pct">0%</span>
+              <span style="font-size:13px;font-weight:700;color:#fff" id="scan-fname"></span>
+              <span style="font-size:11px;color:var(--text3)" id="scan-pct-lbl">0%</span>
             </div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:6px" id="scan-step">Initialisiere Scanner…</div>
-            <div class="progress-bar-wrap"><div class="progress-bar" id="scan-bar" style="width:0%"></div></div>
+            <div class="scan-step-label" id="scan-step-lbl">Initialisiere…</div>
+            <div class="scan-progress-wrap" style="margin-top:8px">
+              <div class="scan-bar-outer"><div class="scan-bar-inner" id="scan-bar" style="width:0%"></div></div>
+            </div>
+            <div class="checks-grid" id="checks-grid" style="margin-top:12px"></div>
           </div>
-          <div class="scan-checks" id="scan-checks-grid"></div>
-        </div>
 
-        <div id="scan-result-box" style="display:none"></div>
+          <div id="scan-result" style="display:none;margin-top:14px"></div>
 
-        <div style="margin-top:20px">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📋 Scan-Verlauf</div>
-          <div class="scan-history" id="scan-history"></div>
+          <div style="margin-top:24px">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">Scan-Verlauf</div>
+            <div id="scan-history"></div>
+            <div id="scan-history-empty" style="font-size:11px;color:var(--text3);padding:8px 0;display:none">Noch keine Scans durchgeführt.</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ======== NEWS ======== -->
-    <div class="page" id="page-news">
-      <div class="section" style="padding-bottom:24px">
-        <div class="section-header" style="margin-top:8px">
-          <span class="section-title">📰 Neuigkeiten & Updates</span>
-        </div>
-        <div class="news-grid">
-          <div class="news-main">
-            <div class="news-thumb-lg" style="background:linear-gradient(135deg,#1a2a4a,#0a1020)">🎮</div>
-            <div class="news-body">
-              <div class="news-category">PLATFORM UPDATE</div>
-              <div class="news-title">Tevive 0.0.0.1 PHXUAL ist da — Virenscanner & neues Design</div>
-              <div class="news-excerpt">Mit dem ersten Snapshot-Release kommt ein komplett überarbeitetes Interface, ein integrierter Virenscanner und eine neue Game-Bibliothek.</div>
-              <div class="news-date">3. Juni 2026 · Tevive Team</div>
+      <!-- ====== UPLOAD ====== -->
+      <div class="page" id="page-upload">
+        <div class="upload-panel">
+          <div style="margin-bottom:16px">
+            <div class="section-title" style="margin-bottom:4px">Spiel hinzufügen</div>
+            <div style="font-size:11px;color:var(--text3)">Füge eine direkte Datei oder einen GitHub-Release-Link hinzu</div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Spielname *</div>
+            <input type="text" class="form-input" id="upl-name" placeholder="z.B. My Awesome Game"/>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Beschreibung</div>
+            <textarea class="form-textarea" id="upl-desc" placeholder="Beschreibe das Spiel…"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">Version</div>
+              <input type="text" class="form-input" id="upl-version" placeholder="1.0.0"/>
+            </div>
+            <div class="form-group">
+              <div class="form-label">Tags (Komma-getrennt)</div>
+              <input type="text" class="form-input" id="upl-tags" placeholder="Action, Shooter, RPG"/>
             </div>
           </div>
-          <div class="news-list" id="news-list"></div>
-        </div>
-        <div class="game-grid" style="margin-top:4px" id="news-more"></div>
-      </div>
-    </div>
 
-    <!-- ======== UPLOAD ======== -->
-    <div class="page" id="page-upload">
-      <div class="upload-form">
-        <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px">Spiel hochladen</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:20px">Teile dein Spiel mit der Tevive-Community — kostenlos, immer</div>
-
-        <div class="scan-notice">🛡️ Jedes hochgeladene Spiel wird automatisch mit dem Virenscanner geprüft, bevor es veröffentlicht wird.</div>
-
-        <div class="upload-dropzone" onclick="toast('Datei-Dialog — in Entwicklung','info')">
-          <div style="font-size:32px;margin-bottom:8px">📦</div>
-          <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px">EXE oder ZIP hier ablegen</div>
-          <div style="font-size:12px;color:var(--text2)">oder klicken zum Durchsuchen · Max 2 GB</div>
-        </div>
-        <div class="form-hint" style="margin-bottom:16px">Alternativ: GitHub Repository verlinken ↓</div>
-
-        <div class="form-group">
-          <label class="form-label">Spielname <span class="required">*</span></label>
-          <input class="form-input" type="text" placeholder="z.B. My Awesome Game" id="upl-name"/>
-        </div>
-        <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Genre <span class="required">*</span></label>
-            <select class="form-select" id="upl-genre">
-              <option>Action</option><option>RPG</option><option>Puzzle</option>
-              <option>Shooter</option><option>Strategy</option><option>Platformer</option>
-              <option>Horror</option><option>Racing</option><option>Sonstige</option>
-            </select>
+            <div class="form-label">Thumbnail</div>
+            <div class="upload-thumb-preview" id="thumb-preview" onclick="pickThumb()">
+              <div class="upload-thumb-placeholder">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#444" style="margin:0 auto 6px"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                Klicken zum Auswählen
+              </div>
+            </div>
+            <div class="form-hint">PNG, JPG, WEBP empfohlen · 16:9 ideal</div>
           </div>
+
           <div class="form-group">
-            <label class="form-label">Version</label>
-            <input class="form-input" type="text" placeholder="z.B. 1.0.0"/>
+            <div class="form-label">Datei-Quelle *</div>
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <button class="btn btn-secondary btn-sm" id="src-gh-btn" onclick="setSrcMode('github')">GitHub Release</button>
+              <button class="btn btn-secondary btn-sm" id="src-url-btn" onclick="setSrcMode('url')">Direkte URL</button>
+            </div>
+
+            <div id="src-github" style="display:none">
+              <input type="text" class="form-input" id="upl-gh-url"
+                placeholder="https://github.com/user/repo/releases/tag/v1.0"
+                oninput="onGhUrlChange(this.value)"/>
+              <div class="resolver-status" id="resolver-status" style="display:none"></div>
+            </div>
+            <div id="src-url" style="display:none">
+              <input type="text" class="form-input" id="upl-direct-url" placeholder="https://example.com/game.zip"/>
+              <div class="form-hint" style="margin-top:4px">Direkte Download-URL zur Datei (ZIP, EXE, RAR, …)</div>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Kurzbeschreibung <span class="required">*</span></label>
-          <textarea class="form-textarea" placeholder="Beschreibe dein Spiel in 1-3 Sätzen…" id="upl-desc"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">GitHub Repository (optional)</label>
-          <input class="form-input" type="text" placeholder="https://github.com/user/my-game"/>
-          <div class="form-hint">Code wird automatisch auf Malware geprüft</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">System-Anforderungen</label>
-          <input class="form-input" type="text" placeholder="z.B. Windows 10, 4 GB RAM, DirectX 11"/>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:4px">
-          <button class="btn btn-primary" onclick="submitUpload()">📤 Spiel einreichen</button>
-          <button class="btn btn-secondary" onclick="toast('Vorschau — in Entwicklung','info')">👁 Vorschau</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- ======== LIBRARY ======== -->
-    <div class="page" id="page-library-home">
-      <div style="padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:18px;font-weight:800;color:#fff">Meine Bibliothek</div>
-        <input type="text" class="form-input" style="width:180px;padding:6px 10px;font-size:12px" placeholder="🔍 Suchen…"/>
-      </div>
-      <div id="library-list">
-        <div class="empty-state">
-          <div class="ei">📭</div>
-          <div class="et">Bibliothek ist leer</div>
-          <div class="es">Lade Spiele herunter, um sie hier zu sehen</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ======== DOWNLOADS ======== -->
-    <div class="page" id="page-downloads">
-      <div style="padding:20px">
-        <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:16px">Downloads & Warteschlange</div>
-        <div id="dl-page-list">
-          <div class="empty-state">
-            <div class="ei">⬇️</div>
-            <div class="et">Keine aktiven Downloads</div>
-            <div class="es">Starte einen Download aus dem Shop</div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="btn btn-primary" onclick="submitGame()">Spiel hinzufügen</button>
+            <button class="btn btn-secondary" onclick="resetUpload()">Zurücksetzen</button>
           </div>
         </div>
       </div>
+
+    </div><!-- /main -->
+  </div><!-- /body -->
+</div><!-- /shell -->
+
+<!-- GAME DETAIL MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeDetailModal()">&#x2715;</button>
     </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
 
-    <!-- ======== ACHIEVEMENTS ======== -->
-    <div class="page" id="page-achievements">
-      <div style="padding:20px 20px 8px">
-        <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px">🏆 Erfolge</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:16px">3 von 12 freigeschaltet</div>
-        <div style="background:var(--surface2);border-radius:4px;height:6px;margin-bottom:20px"><div style="background:linear-gradient(to right,var(--accent),var(--green));height:6px;border-radius:4px;width:25%"></div></div>
-      </div>
-      <div class="achiev-grid" id="achiev-grid"></div>
-    </div>
-
-    <!-- ======== PROFILE ======== -->
-    <div class="page" id="page-profile">
-      <div class="profile-hero">
-        <div class="profile-avatar-lg">T</div>
-        <div class="profile-info">
-          <div class="pname">TeviveUser</div>
-          <div class="pmeta">Mitglied seit Juni 2026 · Tevive 0.0.0.1 PHXUAL</div>
-          <div class="pbadges">
-            <span class="pbadge pbadge-dev">DEV</span>
-            <span class="pbadge pbadge-snap">⚡ SNAPSHOT</span>
-          </div>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-val">0</div><div class="stat-lbl">Spiele in Bibliothek</div></div>
-        <div class="stat-card"><div class="stat-val">0</div><div class="stat-lbl">Hochgeladene Spiele</div></div>
-        <div class="stat-card"><div class="stat-val">3</div><div class="stat-lbl">Erfolge</div></div>
-        <div class="stat-card"><div class="stat-val">0h</div><div class="stat-lbl">Gespielt</div></div>
-      </div>
-      <div style="padding:0 20px 20px">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">⚙️ Einstellungen</div>
-        <div style="background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden">
-          <div class="library-item"><span style="font-size:14px">🌙</span><div class="lib-info"><div class="lib-name">Design</div><div class="lib-meta">Steam Dark (Standard)</div></div></div>
-          <div class="library-item"><span style="font-size:14px">🌐</span><div class="lib-info"><div class="lib-name">Sprache</div><div class="lib-meta">Deutsch</div></div></div>
-          <div class="library-item"><span style="font-size:14px">📁</span><div class="lib-info"><div class="lib-name">Download-Ordner</div><div class="lib-meta">C:\Tevive\Games</div></div></div>
-          <div class="library-item"><span style="font-size:14px">🛡️</span><div class="lib-info"><div class="lib-name">Auto-Scan bei Download</div><div class="lib-meta">Aktiviert — Jedes Spiel wird geprüft</div></div></div>
-          <div class="library-item"><span style="font-size:14px">ℹ️</span><div class="lib-info"><div class="lib-name">Version</div><div class="lib-meta">Tevive 0.0.0.1 PHXUAL · Läuft lokal auf diesem PC</div></div></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /main -->
-</div><!-- /layout -->
-
-<!-- TOASTS -->
-<div class="toast-container" id="toast-container"></div>
+<!-- TOAST -->
+<div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-// ── DATA ──
-const GAMES = [
-  {id:1,name:"Dragon's Descent",genre:"RPG",icon:"🐉",color:"#0d1b2a",size:"1.8 GB",rating:4.8,scanned:"clean",desc:"Episches Open-World RPG",tags:["RPG","Open World","Fantasy"],new:false,popular:true},
-  {id:2,name:"Void Runners",genre:"Shooter",icon:"🚀",color:"#1a0a2e",size:"680 MB",rating:4.5,scanned:"clean",desc:"Sci-Fi Roguelike Shooter",tags:["Shooter","Roguelike","Sci-Fi"],new:true,popular:true},
-  {id:3,name:"Forest Survival X",genre:"Survival",icon:"🌲",color:"#0a1a0a",size:"2.4 GB",rating:4.9,scanned:"clean",desc:"Survival & Crafting in prozedualer Welt",tags:["Survival","Crafting","Open World"],new:false,popular:true},
-  {id:4,name:"Pixel Quest 2",genre:"Platformer",icon:"🕹️",color:"#1a1a2e",size:"120 MB",rating:4.3,scanned:"clean",desc:"Klassischer 2D Platformer",tags:["Platformer","Retro","Indie"],new:true,popular:false},
-  {id:5,name:"Shadow Protocol",genre:"Action",icon:"🥷",color:"#0a0a1a",size:"890 MB",rating:4.6,scanned:"clean",desc:"Stealth-Action Ninja Game",tags:["Action","Stealth","Ninja"],new:false,popular:true},
-  {id:6,name:"Tower Siege X",genre:"Strategy",icon:"🏰",color:"#1a0a0a",size:"350 MB",rating:4.2,scanned:"clean",desc:"Tower Defense Strategie",tags:["Strategy","Tower Defense"],new:false,popular:false},
-  {id:7,name:"Quantum Drift",genre:"Racing",icon:"🏎️",color:"#0a1a1a",size:"1.1 GB",rating:4.7,scanned:"clean",desc:"Futuristisches Racing Spiel",tags:["Racing","Sci-Fi","Arcade"],new:true,popular:true},
-  {id:8,name:"Dungeon Maze",genre:"Puzzle",icon:"🧩",color:"#1a1a0a",size:"220 MB",rating:4.4,scanned:"clean",desc:"Dungeon Puzzle Crawler",tags:["Puzzle","Dungeon","Strategy"],new:false,popular:false},
-  {id:9,name:"Neon Arena",genre:"Action",icon:"⚡",color:"#0a0a2a",size:"540 MB",rating:4.1,scanned:"clean",desc:"Neon-Style Arena Shooter",tags:["Action","Arena","Neon"],new:true,popular:false},
-  {id:10,name:"Witch's Brew",genre:"RPG",icon:"🧙",color:"#1a0a1a",size:"760 MB",rating:4.6,scanned:"clean",desc:"Magisches Action-RPG",tags:["RPG","Magic","Fantasy"],new:false,popular:true},
-  {id:11,name:"Iron Fortress",genre:"Strategy",icon:"⚙️",color:"#1a1a1a",size:"430 MB",rating:4.3,scanned:"clean",desc:"Steampunk Strategie",tags:["Strategy","Steampunk"],new:false,popular:false},
-  {id:12,name:"Nightmare Depths",genre:"Horror",icon:"👻",color:"#050510",size:"1.3 GB",rating:4.7,scanned:"clean",desc:"Atmosphärischer Horror",tags:["Horror","Survival","Dark"],new:true,popular:true},
-  {id:13,name:"Marble Galaxy",genre:"Arcade",icon:"🔵",color:"#0a1020",size:"90 MB",rating:4.0,scanned:"clean",desc:"Entspanntes Arcade Puzzle",tags:["Arcade","Casual","Puzzle"],new:false,popular:false},
-  {id:14,name:"Cyber Samurai",genre:"Action",icon:"🗡️",color:"#0a1a0a",size:"1.5 GB",rating:4.8,scanned:"clean",desc:"Cyberpunk Samurai Action",tags:["Action","Cyberpunk","Samurai"],new:true,popular:true},
-  {id:15,name:"Planet Builder",genre:"Simulation",icon:"🌍",color:"#0a0a1a",size:"280 MB",rating:4.5,scanned:"clean",desc:"Planeten aufbauen & terraformen",tags:["Simulation","Building","Casual"],new:false,popular:false},
-  {id:16,name:"Frostpeak",genre:"Survival",icon:"❄️",color:"#0d1a2e",size:"1.7 GB",rating:4.6,scanned:"clean",desc:"Winter Survival in den Bergen",tags:["Survival","Winter","Open World"],new:false,popular:true},
+// ── Declare API ───────────────────────────────────────────────────────────────
+const tv = window.tevive;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let games = [];
+let activeDownloads = {}; // id → { gameId, name, progress, speed, received, total, done, destPath }
+let currentPage = 'store-home';
+let currentSection = 'store';
+let thumbPath = null;
+let srcMode = 'github';
+let resolvedRelease = null;
+let ghResolveTimer = null;
+let scanActive = false;
+
+// ── Sidebar definitions ───────────────────────────────────────────────────────
+const STORE_NAV = [
+  { id:'store-home', label:'Store', icon:storeSvg() },
+  { id:'store-browse', label:'Alle Spiele', icon:browseSvg() },
+  { id:'scanner', label:'Virenscanner', icon:shieldSvg() },
+  { id:'upload', label:'Spiel hinzufügen', icon:uploadSvg() },
+];
+const LIBRARY_NAV = [
+  { id:'library', label:'Bibliothek', icon:libSvg() },
+  { id:'downloads', label:'Downloads', icon:dlSvg() },
 ];
 
-const NEWS_ITEMS = [
-  {icon:"🎮",bg:"#1a2a1a",cat:"UPDATE",title:"Neues Anti-Cheat System kommt im nächsten Update",date:"2. Juni 2026"},
-  {icon:"🏆",bg:"#2a1a0a",cat:"EVENT",title:"Community Game Jam — Einreichungen ab sofort möglich",date:"1. Juni 2026"},
-  {icon:"🛡️",bg:"#0a1a2a",cat:"SICHERHEIT",title:"Virenscanner jetzt mit 8 Prüfungen — Details",date:"31. Mai 2026"},
-  {icon:"🆕",bg:"#1a0a2a",cat:"NEUE SPIELE",title:"12 neue Indie-Spiele diese Woche veröffentlicht",date:"30. Mai 2026"},
-];
+function storeSvg(){ return '<svg viewBox="0 0 24 24"><path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2zm10 0a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53L8.4 9.6 7.5 7 7 5H4V3H0v2h2l3.6 8.14L4.25 14C4.09 14.3 4 14.64 4 15c0 1.1.9 2 2 2h14v-2H6.42c-.13 0-.25-.11-.25-.25z"/></svg>'; }
+function browseSvg(){ return '<svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>'; }
+function shieldSvg(){ return '<svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>'; }
+function uploadSvg(){ return '<svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>'; }
+function libSvg(){ return '<svg viewBox="0 0 24 24"><path d="M4 6h18V4H4c-1.1 0-2 .9-2 2v13H0v3h14v-3H4V6zm20 2h-8c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h8c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zm-1 9h-6v-7h6v7z"/></svg>'; }
+function dlSvg(){ return '<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>'; }
 
-const ACHIEVEMENTS = [
-  {icon:"🎮",name:"Erster Start",desc:"Tevive zum ersten Mal geöffnet",prog:"Abgeschlossen",done:true},
-  {icon:"🛡️",name:"Sicherheitsbewusst",desc:"Ersten Virenscanner-Check durchgeführt",prog:"Abgeschlossen",done:true},
-  {icon:"⬆️",name:"Entwickler",desc:"Erstes Spiel hochgeladen",prog:"0 / 1",done:false},
-  {icon:"⬇️",name:"Downloader",desc:"Erstes Spiel heruntergeladen",prog:"0 / 1",done:false},
-  {icon:"🏆",name:"Sammler",desc:"10 Spiele in der Bibliothek",prog:"0 / 10",done:false},
-  {icon:"⭐",name:"Kritiker",desc:"Erstes Spiel bewertet",prog:"0 / 1",done:false},
-  {icon:"🔍",name:"Researcher",desc:"50 Spiele angeschaut",prog:"0 / 50",done:false},
-  {icon:"🎯",name:"Hardcore",desc:"Alle Achievements freigeschaltet",prog:"3 / 12",done:false},
-  {icon:"🌟",name:"Früher Adopter",desc:"In den ersten 1000 Usern angemeldet",prog:"Abgeschlossen",done:true},
-  {icon:"💬",name:"Community",desc:"Ersten Kommentar geschrieben",prog:"0 / 1",done:false},
-  {icon:"🎁",name:"Großzügig",desc:"Erstes Spiel der Community empfohlen",prog:"0 / 1",done:false},
-  {icon:"🚀",name:"Power User",desc:"30 Tage in Folge aktiv",prog:"1 / 30",done:false},
-];
+function buildSidebar() {
+  const nav = currentSection === 'library' ? LIBRARY_NAV : STORE_NAV;
+  document.getElementById('sidebar').innerHTML =
+    '<div class="sidebar-sec">' + (currentSection === 'library' ? 'Bibliothek' : 'Entdecken') + '</div>' +
+    nav.map(n => `<div class="sidebar-item ${currentPage===n.id?'active':''}" onclick="showPage('${n.id}')">${n.icon}${n.label}</div>`).join('');
+}
 
-// ── STATE ──
-let currentSlide = 0, slideTimer;
-let scanHistory = [];
-let activeDownloads = [];
-let currentFilter = null;
+// ── Navigation ────────────────────────────────────────────────────────────────
+function topNav(el, section) {
+  document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  currentSection = section;
+  if (section === 'library') {
+    showPage('library');
+  } else {
+    showPage('store-home');
+  }
+}
 
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', () => {
-  renderPopular(); renderNew(); renderTopRated();
-  renderBrowse(); renderNews(); renderAchievements();
-  renderScanHistory(); renderLibrary();
-  startSlideshow();
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const p = document.getElementById('page-' + id);
+  if (p) p.classList.add('active');
+  currentPage = id;
+  if (['library','downloads'].includes(id)) currentSection = 'library';
+  else currentSection = 'store';
+  buildSidebar();
+
+  if (id === 'store-home') renderHome();
+  if (id === 'store-browse') renderBrowse();
+  if (id === 'library') renderLibrary();
+  if (id === 'downloads') renderDownloads();
+  if (id === 'scanner') renderScanHistory();
+}
+
+// ── Load games ────────────────────────────────────────────────────────────────
+async function loadGames() {
+  games = await tv.getGames();
+  renderHome();
+  buildSidebar();
+}
+
+// ── Render home ───────────────────────────────────────────────────────────────
+function renderHome() {
+  const pop = document.getElementById('grid-popular');
+  const rec = document.getElementById('grid-recent');
+  const empty = document.getElementById('home-empty');
+
+  if (!games.length) {
+    pop.innerHTML = ''; rec.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const sorted = [...games].sort((a,b) => new Date(b.addedAt) - new Date(a.addedAt));
+  pop.innerHTML = sorted.slice(0,6).map(gameCard).join('');
+  rec.innerHTML = sorted.slice(0,4).map(gameCard).join('');
+}
+
+// ── Render browse ─────────────────────────────────────────────────────────────
+function renderBrowse() {
+  const q = (document.getElementById('browse-search')?.value || '').toLowerCase();
+  const sort = document.getElementById('browse-sort')?.value || 'recent';
+  const activeTag = document.querySelector('.filter-chip.active')?.dataset?.tag || '';
+
+  let list = [...games];
+  if (q) list = list.filter(g => g.title.toLowerCase().includes(q) || (g.description||'').toLowerCase().includes(q));
+  if (activeTag) list = list.filter(g => g.tags && g.tags.includes(activeTag));
+  if (sort === 'name') list.sort((a,b) => a.title.localeCompare(b.title));
+  else list.sort((a,b) => new Date(b.addedAt) - new Date(a.addedAt));
+
+  // Build tag filters
+  const allTags = [...new Set(games.flatMap(g => g.tags || []))];
+  const filtersEl = document.getElementById('browse-filters');
+  if (filtersEl) {
+    filtersEl.innerHTML = ['<button class="filter-chip '+(activeTag?'':'active')+'" onclick="clearTagFilter(this)">Alle</button>',
+      ...allTags.map(t => `<button class="filter-chip ${activeTag===t?'active':''}" data-tag="${t}" onclick="tagFilter(this,'${t}')">${t}</button>`)
+    ].join('');
+  }
+
+  document.getElementById('browse-count').textContent = `(${list.length})`;
+  document.getElementById('grid-browse').innerHTML = list.map(gameCard).join('');
+  const emp = document.getElementById('browse-empty');
+  if (emp) emp.style.display = !list.length ? '' : 'none';
+}
+
+function tagFilter(el, tag) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderBrowse();
+}
+function clearTagFilter(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderBrowse();
+}
+
+// ── Render library ────────────────────────────────────────────────────────────
+function renderLibrary() {
+  const installed = games.filter(g => g.installed || g.localPath);
+  const el = document.getElementById('grid-library');
+  const emp = document.getElementById('library-empty');
+  el.innerHTML = installed.map(gameCard).join('');
+  if (emp) emp.style.display = !installed.length ? '' : 'none';
+}
+
+// ── Game card HTML ────────────────────────────────────────────────────────────
+function gameCard(g) {
+  const thumb = g.thumbnailPath
+    ? `<img src="tevive-local://${g.thumbnailPath}" onerror="this.style.display='none';this.nextSibling.style.display='flex'" /><div class="game-thumb-placeholder" style="display:none">${g.title}</div>`
+    : `<div class="game-thumb-placeholder">${g.title}</div>`;
+  const badge = g.scanStatus === 'clean' ? '<span class="game-scan-badge badge-clean">Sauber</span>'
+    : g.scanStatus === 'threat' ? '<span class="game-scan-badge badge-threat">Bedrohung</span>'
+    : g.scanStatus === 'scanning' ? '<span class="game-scan-badge badge-scanning">Wird gescannt</span>'
+    : g.scanStatus === 'pending' ? '<span class="game-scan-badge badge-pending">Ausstehend</span>'
+    : '';
+  const tags = (g.tags||[]).slice(0,3).map(t => `<span class="game-tag">${t}</span>`).join('');
+  return `<div class="game-card" onclick="openDetail('${g.id}')">
+    <div class="game-thumb">${thumb}${badge}</div>
+    <div class="game-info">
+      <div class="game-title">${g.title}</div>
+      <div class="game-meta">${g.version ? 'v' + g.version : ''}</div>
+      <div class="game-tags">${tags}</div>
+    </div>
+  </div>`;
+}
+
+// ── Download rendering ────────────────────────────────────────────────────────
+function renderDownloads() {
+  const list = document.getElementById('dl-list');
+  const emp = document.getElementById('dl-empty');
+  const items = Object.entries(activeDownloads);
+  if (!items.length) {
+    list.innerHTML = '';
+    if (emp) emp.style.display = '';
+    return;
+  }
+  if (emp) emp.style.display = 'none';
+
+  list.innerHTML = items.map(([dlId, dl]) => {
+    const game = games.find(g => g.id === dl.gameId) || {};
+    const thumb = game.thumbnailPath
+      ? `<img src="tevive-local://${game.thumbnailPath}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`
+      : '';
+    const speed = formatSpeed(dl.speed);
+    const recv = formatBytes(dl.received);
+    const total = dl.total > 0 ? formatBytes(dl.total) : '?';
+    const pct = dl.progress < 0 ? -1 : Math.round(dl.progress);
+    const pctStr = pct < 0 ? '…' : pct + '%';
+    const barW = pct < 0 ? 40 : pct;
+    const done = dl.done && !dl.error;
+    const err = dl.error;
+
+    return `<div class="dl-item">
+      <div class="dl-thumb">${thumb}</div>
+      <div class="dl-info">
+        <div class="dl-name">${dl.name || game.title || 'Download'}</div>
+        <div class="dl-stats">${done ? 'Abgeschlossen — ' + formatBytes(dl.received) : err ? 'Fehler: ' + err : recv + ' / ' + total + ' — ' + speed}</div>
+      </div>
+      ${done
+        ? `<span style="font-size:11px;font-weight:700;color:var(--green)">Fertig</span>`
+        : err
+          ? `<span style="font-size:11px;font-weight:700;color:var(--red)">Fehler</span>`
+          : `<div class="dl-bar-wrap"><div class="dl-bar" style="width:${barW}%"></div></div>
+             <div class="dl-pct">${pctStr}</div>
+             <div class="dl-actions"><button class="btn btn-danger btn-sm" onclick="cancelDl('${dlId}')">Abbrechen</button></div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function formatSpeed(bps) {
+  if (!bps || bps < 0) return '';
+  if (bps < 1024) return bps.toFixed(0) + ' B/s';
+  if (bps < 1024*1024) return (bps/1024).toFixed(1) + ' KB/s';
+  return (bps/(1024*1024)).toFixed(2) + ' MB/s';
+}
+function formatBytes(b) {
+  if (!b || b < 0) return '0 B';
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  if (b < 1024*1024*1024) return (b/(1024*1024)).toFixed(2) + ' MB';
+  return (b/(1024*1024*1024)).toFixed(2) + ' GB';
+}
+
+async function cancelDl(dlId) {
+  await tv.cancelDownload(dlId);
+  delete activeDownloads[dlId];
+  renderDownloads();
+  toast('Download abgebrochen', 'info');
+}
+
+// ── Download progress listener ────────────────────────────────────────────────
+tv.onDownloadProgress(data => {
+  const dl = activeDownloads[data.id];
+  if (dl) {
+    dl.progress = data.progress;
+    dl.speed = data.speed;
+    dl.received = data.received;
+    dl.total = data.total;
+    dl.done = data.done;
+    dl.error = data.error;
+    if (data.destPath) dl.destPath = data.destPath;
+    if (data.done && !data.error) {
+      // Mark game as installed
+      const g = games.find(gg => gg.id === dl.gameId);
+      if (g) {
+        g.localPath = data.destPath;
+        g.installed = true;
+        tv.updateGame(g.id, { localPath: data.destPath, installed: true });
+      }
+      toast(`${dl.name} heruntergeladen`, 'success');
+    }
+    if (data.error) toast('Download-Fehler: ' + data.error, 'error');
+  }
+  if (currentPage === 'downloads') renderDownloads();
 });
 
-function renderPopular(){
-  document.getElementById('grid-popular').innerHTML = GAMES.filter(g=>g.popular).slice(0,6).map(gameCard).join('');
-}
-function renderNew(){
-  document.getElementById('grid-new').innerHTML = GAMES.filter(g=>g.new).slice(0,6).map(gameCard).join('');
-}
-function renderTopRated(){
-  document.getElementById('grid-top').innerHTML = [...GAMES].sort((a,b)=>b.rating-a.rating).slice(0,6).map(gameCardLg).join('');
-}
-function renderBrowse(){
-  const q = document.getElementById('browse-search').value.toLowerCase();
-  const sort = document.getElementById('browse-sort').value;
-  let list = GAMES.filter(g => {
-    const matchQ = !q || g.name.toLowerCase().includes(q) || g.genre.toLowerCase().includes(q) || g.tags.some(t=>t.toLowerCase().includes(q));
-    const matchCat = !currentFilter || g.genre === currentFilter || g.tags.includes(currentFilter);
-    return matchQ && matchCat;
-  });
-  if(sort==='Neu zuerst') list = list.filter(g=>g.new).concat(list.filter(g=>!g.new));
-  if(sort==='Name A-Z') list.sort((a,b)=>a.name.localeCompare(b.name));
-  if(sort==='Größe ↑') list.sort((a,b)=>parseFloat(a.size)-parseFloat(b.size));
-  document.getElementById('browse-count').textContent = `(${list.length} Spiele)`;
-  document.getElementById('grid-browse').innerHTML = list.map(gameCard).join('');
-  // Tags
-  const cats = [...new Set(GAMES.map(g=>g.genre))];
-  document.getElementById('browse-tags').innerHTML = 
-    `<button class="tag-btn ${!currentFilter?'active':''}" onclick="setFilter(null)">Alle</button>` +
-    cats.map(c=>`<button class="tag-btn ${currentFilter===c?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
-}
-function setFilter(cat){ currentFilter=cat; renderBrowse(); }
-function filterCategory(cat){ currentFilter=cat; showPage('store-browse',null); renderBrowse(); }
-
-function gameCard(g){
-  const stars = '★'.repeat(Math.round(g.rating)) + '☆'.repeat(5-Math.round(g.rating));
-  return `<div class="game-card" onclick="startDownload('${g.name}','${g.size}')">
-    <div class="game-thumb">
-      <div class="game-thumb-bg" style="background:linear-gradient(135deg,${g.color},${g.color}88)">${g.icon}</div>
-      <div class="game-scan-badge"><span class="scan-clean">✓</span> <span style="color:#aaa">Clean</span></div>
-      ${g.new?'<div style="position:absolute;top:5px;left:5px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:2px">NEU</div>':''}
-    </div>
-    <div class="game-info">
-      <div class="game-name">${g.name}</div>
-      <div class="game-meta">
-        <span class="game-genre">${g.genre}</span>
-        <span class="game-rating" title="${g.rating}/5">${g.rating}</span>
-      </div>
-      <div class="game-meta" style="margin-top:4px">
-        <span class="game-size">${g.size}</span>
-        <span class="game-free">KOSTENLOS</span>
-      </div>
-    </div>
-  </div>`;
-}
-function gameCardLg(g){
-  return `<div class="game-card-lg" onclick="startDownload('${g.name}','${g.size}')">
-    <div class="thumb" style="background:linear-gradient(135deg,${g.color},${g.color}88)">${g.icon}</div>
-    <div class="info">
-      <div class="name">${g.name}</div>
-      <div class="meta">${g.size} · ★ ${g.rating}</div>
-      <div class="tags">${g.tags.slice(0,3).map(t=>`<span class="game-tag">${t}</span>`).join('')} <span class="game-tag" style="color:#4ade80">KOSTENLOS</span></div>
-    </div>
-  </div>`;
-}
-
-function renderNews(){
-  document.getElementById('news-list').innerHTML = NEWS_ITEMS.map(n=>`
-    <div class="news-item">
-      <div class="news-item-thumb" style="background:${n.bg}">${n.icon}</div>
-      <div class="news-item-body">
-        <div class="nt">${n.title}</div>
-        <div class="nd">${n.cat} · ${n.date}</div>
-      </div>
-    </div>`).join('');
-}
-
-function renderAchievements(){
-  document.getElementById('achiev-grid').innerHTML = ACHIEVEMENTS.map(a=>`
-    <div class="achiev-card ${a.done?'':'locked'}">
-      <div class="achiev-icon">${a.icon}</div>
-      <div class="achiev-info">
-        <div class="aname">${a.name}</div>
-        <div class="adesc">${a.desc}</div>
-        <div class="aprog">${a.prog}</div>
-      </div>
-    </div>`).join('');
-}
-
-function renderLibrary(){
-  const el = document.getElementById('library-list');
-  if(activeDownloads.length===0){
-    el.innerHTML = `<div class="empty-state"><div class="ei">📭</div><div class="et">Bibliothek ist leer</div><div class="es">Lade Spiele herunter, um sie hier zu sehen</div></div>`;
-  } else {
-    el.innerHTML = activeDownloads.filter(d=>d.done).map(d=>`
-      <div class="library-item">
-        <div class="lib-thumb" style="background:#1a2a3a">${d.icon||'🎮'}</div>
-        <div class="lib-info"><div class="lib-name">${d.name}</div><div class="lib-meta">${d.size} · Installiert</div></div>
-        <div class="lib-actions">
-          <button class="lib-play" onclick="toast('${d.name} wird gestartet…','success')">▶ Spielen</button>
-          <button class="lib-opts" onclick="toast('Optionen — in Entwicklung','info')">···</button>
-        </div>
-      </div>`).join('');
-  }
-}
-
-// ── DOWNLOADS ──
-function startDownload(name, size){
-  const existing = activeDownloads.find(d=>d.name===name);
-  if(existing && !existing.done){ toast(`${name} lädt bereits!`,'info'); return; }
-  const game = GAMES.find(g=>g.name===name) || {icon:'🎮'};
-  const dl = {name,size,icon:game.icon,progress:0,done:false,id:Date.now()};
-  activeDownloads.push(dl);
-  document.getElementById('dl-section').style.display='block';
-  updateDLUI();
-  toast(`Download gestartet: ${name}`,'success');
-  // Simulate download
-  const bytes = parseFloat(size);
-  const step = 100 / (bytes * 10);
-  const iv = setInterval(()=>{
-    dl.progress = Math.min(100, dl.progress + step + Math.random()*step);
-    updateDLUI();
-    if(dl.progress>=100){ dl.progress=100; dl.done=true; clearInterval(iv); updateDLUI(); renderLibrary(); toast(`${name} heruntergeladen!`,'success'); }
-  }, 200);
-}
-function updateDLUI(){
-  const active = activeDownloads.filter(d=>!d.done);
-  const dlList = document.getElementById('dl-list');
-  const dlPage = document.getElementById('dl-page-list');
-  const allDL = activeDownloads;
-  const renderDLItem = d => `<div class="dl-progress">
-    <span style="font-size:16px">${d.icon}</span>
-    <span class="dp-name">${d.name}</span>
-    <span class="dp-size">${d.size}</span>
-    <div class="dl-bar-wrap"><div class="dl-bar" style="width:${d.progress}%"></div></div>
-    <span style="font-size:11px;color:var(--text2);width:34px;text-align:right">${Math.round(d.progress)}%</span>
-    ${d.done?'<span style="color:#4ade80;font-size:11px;font-weight:700">✓</span>':'<span class="dl-cancel" onclick="cancelDL('+d.id+')">✕</span>'}
-  </div>`;
-  dlList.innerHTML = active.map(renderDLItem).join('');
-  dlPage.innerHTML = allDL.length ? allDL.map(renderDLItem).join('') : `<div class="empty-state"><div class="ei">⬇️</div><div class="et">Keine aktiven Downloads</div><div class="es">Starte einen Download aus dem Shop</div></div>`;
-  document.getElementById('dl-section').style.display = active.length ? 'block' : 'none';
-}
-function cancelDL(id){
-  activeDownloads = activeDownloads.filter(d=>d.id!==id);
-  updateDLUI(); toast('Download abgebrochen','info');
-}
-
-// ── VIRUS SCANNER ──
+// ── Scanner ───────────────────────────────────────────────────────────────────
 const SCAN_CHECKS = [
-  {id:'sig',icon:'🔍',label:'Signatur-Analyse'},
-  {id:'behav',icon:'⚙️',label:'Verhaltensanalyse'},
-  {id:'heur',icon:'🧠',label:'Heuristik-Scan'},
-  {id:'net',icon:'🌐',label:'Netzwerk-Check'},
-  {id:'perm',icon:'🔐',label:'Berechtigungen'},
-  {id:'hash',icon:'#️⃣',label:'Hash-Prüfung'},
-  {id:'pe',icon:'📋',label:'PE-Header Analyse'},
-  {id:'sandbox',icon:'📦',label:'Sandbox-Emulation'},
+  { id:'sig',   label:'Signatur-Analyse' },
+  { id:'behav', label:'Verhaltensanalyse' },
+  { id:'heur',  label:'Heuristik-Scan' },
+  { id:'net',   label:'Netzwerk-Indikatoren' },
+  { id:'perm',  label:'Berechtigungsanalyse' },
+  { id:'hash',  label:'Hash-Verifizierung' },
+  { id:'pe',    label:'PE-Header-Analyse' },
+  { id:'sandbox', label:'Sandbox-Emulation' },
 ];
-let scanState = {};
 
-function renderScanChecks(){
-  document.getElementById('scan-checks-grid').innerHTML = SCAN_CHECKS.map(c=>`
-    <div class="scan-check" id="sc-${c.id}">
-      <span class="check-icon">${c.icon}</span>
+function checkSvg(ok) {
+  return ok
+    ? '<svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+    : '<svg class="check-icon" viewBox="0 0 24 24"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm1-5C6.47 2 2 6.5 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8z"/></svg>';
+}
+function waitSvg() {
+  return '<svg class="check-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>';
+}
+
+function renderChecks(progress) {
+  const total = SCAN_CHECKS.length;
+  const done = Math.floor((progress / 100) * total);
+  return SCAN_CHECKS.map((c, i) => {
+    const isDone = i < done;
+    return `<div class="check-item ${isDone ? 'ok' : ''}" id="chk-${c.id}">
+      ${isDone ? checkSvg(true) : waitSvg()}
       <span class="check-label">${c.label}</span>
-      <span class="check-status check-pending" id="ss-${c.id}">Warte…</span>
-    </div>`).join('');
+      <span class="check-status ${isDone ? 'ok' : 'pending'}">${isDone ? 'OK' : 'Warte'}</span>
+    </div>`;
+  }).join('');
 }
 
-function startScan(file){
-  const fname = file || 'beispiel_game.exe';
-  document.getElementById('scan-drop').style.display='none';
-  document.getElementById('scan-running').style.display='block';
-  document.getElementById('scan-result-box').style.display='none';
-  document.getElementById('scan-filename').textContent = fname;
-  renderScanChecks();
-  let pct = 0;
-  const steps = [
-    'Initialisiere Scanner…','Lese Datei-Header…','Analysiere Struktur…',
-    'Vergleiche Signaturen…','Prüfe Verhalten…','Netzwerkanalyse…',
-    'Hash-Überprüfung…','Sandbox-Test läuft…','Finalisiere Ergebnis…'
-  ];
-  let si=0, ci=0;
-  const iv = setInterval(()=>{
-    pct = Math.min(100, pct + 1.5 + Math.random()*2);
-    document.getElementById('scan-bar').style.width = pct+'%';
-    document.getElementById('scan-pct').textContent = Math.round(pct)+'%';
-    document.getElementById('scan-step').textContent = steps[Math.min(si++>>2, steps.length-1)];
-    // Activate checks one by one
-    if(pct > (ci+1)*(100/SCAN_CHECKS.length)){
-      const chk = SCAN_CHECKS[ci];
-      if(chk){
-        document.getElementById('ss-'+chk.id).className='check-status check-ok';
-        document.getElementById('ss-'+chk.id).textContent='✓ Sauber';
-        document.getElementById('sc-'+chk.id).style.background='rgba(74,222,128,.08)';
-      }
-      ci++;
-    }
-    if(pct>=100){
-      clearInterval(iv);
-      showScanResult(fname, true);
-    }
-  },80);
+async function pickAndScan() {
+  if (scanActive) return;
+  const filePath = await tv.pickFileToScan();
+  if (!filePath) return;
+  startScan(filePath);
 }
 
-function showScanResult(fname, clean){
-  document.getElementById('scan-running').style.display='none';
-  const rb = document.getElementById('scan-result-box');
-  rb.style.display='block';
-  rb.innerHTML = clean
-    ? `<div class="scan-result clean"><span class="result-icon">✅</span><div class="result-text"><div class="rt" style="color:#4ade80">Keine Bedrohung gefunden</div><div class="rs">8/8 Checks bestanden · ${fname} ist sicher</div></div><button class="btn btn-primary btn-sm" onclick="toast('Download gestartet!','success')">⬇ Herunterladen</button></div>`
-    : `<div class="scan-result danger"><span class="result-icon">🚨</span><div class="result-text"><div class="rt" style="color:#f87171">Bedrohung erkannt!</div><div class="rs">${fname} enthält potentiell schädlichen Code. Download blockiert.</div></div><button class="btn btn-danger btn-sm" onclick="toast('Datei gelöscht','error')">🗑 Löschen</button></div>`;
-  // Add to history
-  scanHistory.unshift({name:fname,date:new Date().toLocaleDateString('de-DE'),clean});
-  renderScanHistory();
-  document.getElementById('scan-drop').style.display='block';
-  document.getElementById('scan-result-box').innerHTML += `<div style="text-align:center;margin-top:10px"><button class="btn btn-secondary btn-sm" onclick="resetScan()">Weitere Datei scannen</button></div>`;
-}
-
-function resetScan(){
-  document.getElementById('scan-result-box').style.display='none';
-}
-
-function handleScanDrop(e){
+function handleDrop(e) {
   e.preventDefault();
-  document.getElementById('scan-drop').classList.remove('drag');
+  document.getElementById('scan-zone').classList.remove('drag');
   const f = e.dataTransfer.files[0];
-  if(f) startScan(f.name);
+  if (!f) return;
+  // In Electron the path is available via f.path
+  const p = f.path || f.name;
+  if (p && p.includes('/') || p && p.includes('\\')) {
+    startScan(p);
+  } else {
+    toast('Datei-Pfad nicht zugänglich — bitte über den Dialog öffnen', 'error');
+  }
 }
 
-function renderScanHistory(){
+async function startScan(filePath) {
+  scanActive = true;
+  document.getElementById('scan-zone').style.display = 'none';
+  document.getElementById('scan-running').style.display = 'block';
+  document.getElementById('scan-result').style.display = 'none';
+  document.getElementById('scan-fname').textContent = filePath.split(/[\\/]/).pop();
+  document.getElementById('scan-bar').style.width = '0%';
+  document.getElementById('scan-pct-lbl').textContent = '0%';
+  document.getElementById('scan-step-lbl').textContent = 'Initialisiere…';
+  document.getElementById('checks-grid').innerHTML = renderChecks(0);
+
+  tv.onScanUpdate(data => {
+    document.getElementById('scan-bar').style.width = data.pct + '%';
+    document.getElementById('scan-pct-lbl').textContent = Math.round(data.pct) + '%';
+    document.getElementById('scan-step-lbl').textContent = data.step || '';
+    document.getElementById('checks-grid').innerHTML = renderChecks(data.pct);
+
+    if (data.status !== 'scanning') {
+      tv.offScanUpdate();
+      scanActive = false;
+      showScanResult(data);
+      renderScanHistory();
+    }
+  });
+
+  await tv.scanFile(filePath);
+}
+
+function showScanResult(data) {
+  document.getElementById('scan-running').style.display = 'none';
+  const el = document.getElementById('scan-result');
+  el.style.display = '';
+  const clean = data.status === 'clean';
+  const threats = data.threats || [];
+  const threatHtml = threats.length
+    ? '<div class="threat-list">' + threats.map(t => `<span class="threat-item">${t}</span>`).join('') + '</div>'
+    : '';
+  const engineNote = data.engine ? `<span style="font-size:10px;color:var(--text3);margin-left:8px">[${data.engine}]</span>` : '';
+  el.innerHTML = `<div class="scan-result ${clean ? 'clean' : 'threat'}">
+    <svg class="scan-result-icon" viewBox="0 0 24 24">
+      ${clean
+        ? '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>'
+        : '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>'}
+    </svg>
+    <div class="scan-result-body">
+      <div class="scan-result-title">${clean ? 'Keine Bedrohung gefunden' : 'Bedrohung erkannt'}${engineNote}</div>
+      <div class="scan-result-sub">${clean
+        ? `${SCAN_CHECKS.length} Checks bestanden`
+        : `${threats.length} Bedrohung(en) erkannt — Download wird blockiert empfohlen`}
+      </div>
+      ${threatHtml}
+    </div>
+  </div>
+  <button class="btn btn-secondary btn-sm" onclick="resetScan()" style="margin-top:8px">Weitere Datei scannen</button>`;
+}
+
+function resetScan() {
+  scanActive = false;
+  document.getElementById('scan-zone').style.display = '';
+  document.getElementById('scan-running').style.display = 'none';
+  document.getElementById('scan-result').style.display = 'none';
+}
+
+async function renderScanHistory() {
+  const history = await tv.getScanHistory();
   const el = document.getElementById('scan-history');
-  const defaultH = [
-    {name:'tevive_setup_windows.exe',date:'03.06.2026',clean:true},
-    {name:'sample_game_v2.zip',date:'03.06.2026',clean:true},
-  ];
-  const list = [...scanHistory, ...defaultH].slice(0,8);
-  el.innerHTML = list.map(h=>`
-    <div class="scan-history-item">
-      <span style="font-size:14px">${h.clean?'✅':'🚨'}</span>
-      <span class="shi-name">${h.name}</span>
-      <span class="shi-date">${h.date}</span>
-      <span class="shi-result ${h.clean?'shi-clean':'shi-danger'}">${h.clean?'SAUBER':'GEFAHR'}</span>
-    </div>`).join('');
+  const emp = document.getElementById('scan-history-empty');
+  if (!history.length) {
+    el.innerHTML = '';
+    if (emp) emp.style.display = '';
+    return;
+  }
+  if (emp) emp.style.display = 'none';
+  el.innerHTML = history.slice(0,10).map(h => {
+    const d = h.finishedAt ? new Date(h.finishedAt).toLocaleDateString('de-DE') : '—';
+    return `<div class="history-item">
+      <div class="history-status ${h.status}"></div>
+      <div class="history-name">${h.fileName}</div>
+      <div class="history-engine">${h.engine}</div>
+      <div class="history-date">${d}</div>
+      <div class="history-badge ${h.status}">${h.status === 'clean' ? 'SAUBER' : h.status === 'threat' ? 'BEDROHUNG' : 'SCAN'}</div>
+    </div>`;
+  }).join('');
 }
 
-// ── NAVIGATION ──
-function showPage(id, tabEl){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  if(tabEl){
-    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-    tabEl.classList.add('active');
+// ── Upload / Add game ─────────────────────────────────────────────────────────
+function setSrcMode(mode) {
+  srcMode = mode;
+  resolvedRelease = null;
+  document.getElementById('src-github').style.display = mode === 'github' ? '' : 'none';
+  document.getElementById('src-url').style.display = mode === 'url' ? '' : 'none';
+  document.getElementById('src-gh-btn').className = 'btn btn-sm ' + (mode === 'github' ? 'btn-primary' : 'btn-secondary');
+  document.getElementById('src-url-btn').className = 'btn btn-sm ' + (mode === 'url' ? 'btn-primary' : 'btn-secondary');
+}
+
+function onGhUrlChange(url) {
+  const statusEl = document.getElementById('resolver-status');
+  if (ghResolveTimer) clearTimeout(ghResolveTimer);
+  resolvedRelease = null;
+  if (!url.includes('github.com')) {
+    statusEl.style.display = 'none';
+    return;
+  }
+  statusEl.className = 'resolver-status loading';
+  statusEl.style.display = 'flex';
+  statusEl.innerHTML = '<span class="dots">Löse Release auf</span>';
+  ghResolveTimer = setTimeout(async () => {
+    const result = await tv.resolveGithubRelease(url);
+    if (result) {
+      resolvedRelease = result;
+      statusEl.className = 'resolver-status ok';
+      statusEl.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        ${result.fileName} ${result.size ? '(' + formatBytes(result.size) + ')' : ''}`;
+    } else {
+      statusEl.className = 'resolver-status error';
+      statusEl.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        Release nicht gefunden — URL prüfen`;
+    }
+  }, 700);
+}
+
+async function pickThumb() {
+  const p = await tv.pickThumbnail();
+  if (!p) return;
+  thumbPath = p;
+  const prev = document.getElementById('thumb-preview');
+  prev.innerHTML = `<img src="tevive-local://${p}" style="width:100%;height:100%;object-fit:cover" onerror="this.src=''" />`;
+}
+
+async function submitGame() {
+  const name = document.getElementById('upl-name').value.trim();
+  if (!name) { toast('Spielname ist erforderlich', 'error'); return; }
+
+  let releaseUrl = '';
+  let fileName = '';
+  let size = 0;
+
+  if (srcMode === 'github') {
+    const ghUrl = document.getElementById('upl-gh-url').value.trim();
+    if (!ghUrl) { toast('GitHub-URL ist erforderlich', 'error'); return; }
+    if (!resolvedRelease) { toast('Release wird noch aufgelöst — kurz warten', 'error'); return; }
+    releaseUrl = resolvedRelease.downloadUrl;
+    fileName = resolvedRelease.fileName;
+    size = resolvedRelease.size || 0;
+  } else {
+    releaseUrl = document.getElementById('upl-direct-url').value.trim();
+    if (!releaseUrl) { toast('Download-URL ist erforderlich', 'error'); return; }
+    const parts = releaseUrl.split('/');
+    fileName = parts[parts.length - 1] || 'download';
+  }
+
+  const tags = document.getElementById('upl-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const version = document.getElementById('upl-version').value.trim();
+  const desc = document.getElementById('upl-desc').value.trim();
+
+  const newGame = await tv.addGame({
+    title: name,
+    description: desc,
+    version,
+    tags,
+    thumbnailPath: thumbPath || null,
+    releaseUrl,
+    downloadSize: size,
+  });
+
+  games.push(newGame);
+  toast(`"${name}" hinzugefügt`, 'success');
+  resetUpload();
+  showPage('store-browse');
+}
+
+function resetUpload() {
+  document.getElementById('upl-name').value = '';
+  document.getElementById('upl-desc').value = '';
+  document.getElementById('upl-version').value = '';
+  document.getElementById('upl-tags').value = '';
+  document.getElementById('upl-gh-url').value = '';
+  document.getElementById('upl-direct-url').value = '';
+  document.getElementById('thumb-preview').innerHTML = `<div class="upload-thumb-placeholder">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="#444" style="margin:0 auto 6px"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+    Klicken zum Auswählen</div>`;
+  thumbPath = null;
+  resolvedRelease = null;
+  document.getElementById('resolver-status').style.display = 'none';
+  setSrcMode('github');
+}
+
+// ── Game detail modal ─────────────────────────────────────────────────────────
+function openDetail(id) {
+  const g = games.find(x => x.id === id);
+  if (!g) return;
+
+  document.getElementById('modal-title').textContent = g.title;
+  const thumb = g.thumbnailPath
+    ? `<img src="tevive-local://${g.thumbnailPath}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`
+    : `<div class="modal-hero-placeholder">${g.title}</div>`;
+
+  const dlBtn = g.installed
+    ? `<button class="btn btn-secondary" onclick="tv.openInFolder('${(g.localPath||'').replace(/\\/g,'/')}')">Im Ordner anzeigen</button>
+       <button class="btn btn-primary" onclick="tv.launchGame('${(g.localPath||'').replace(/\\/g,'/')}')">Starten</button>`
+    : g.releaseUrl
+      ? `<button class="btn btn-primary" onclick="downloadGame('${g.id}');closeDetailModal()">Herunterladen</button>`
+      : `<span style="font-size:11px;color:var(--text3)">Keine Download-Quelle verfügbar</span>`;
+
+  const scanBadge = g.scanStatus === 'clean'
+    ? `<span class="history-badge clean">SAUBER</span>`
+    : g.scanStatus === 'threat'
+      ? `<span class="history-badge threat">BEDROHUNG</span>`
+      : g.localPath
+        ? `<button class="btn btn-secondary btn-sm" onclick="scanGame('${g.id}');closeDetailModal()">Jetzt scannen</button>`
+        : '';
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-hero">${thumb}</div>
+    <div class="modal-meta">
+      <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">${g.version || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Hinzugefügt</div><div class="meta-value">${new Date(g.addedAt).toLocaleDateString('de-DE')}</div></div>
+      <div class="meta-item"><div class="meta-label">Tags</div><div class="meta-value">${(g.tags||[]).join(', ') || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Scan-Status</div><div class="meta-value" style="display:flex;align-items:center;gap:6px">${g.scanStatus||'Nicht gescannt'} ${scanBadge}</div></div>
+    </div>
+    ${g.description ? `<div class="modal-desc">${g.description}</div>` : ''}
+    <div class="modal-actions">
+      ${dlBtn}
+      <button class="btn btn-danger btn-sm" onclick="deleteGame('${g.id}');closeDetailModal()" style="margin-left:auto">Entfernen</button>
+    </div>`;
+
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+
+function closeDetailModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeDetailModal();
+}
+
+// ── Download game ─────────────────────────────────────────────────────────────
+async function downloadGame(gameId) {
+  const g = games.find(x => x.id === gameId);
+  if (!g || !g.releaseUrl) { toast('Keine Download-URL', 'error'); return; }
+
+  let downloadUrl = g.releaseUrl;
+  let fileName = g.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  let totalSize = g.downloadSize || 0;
+
+  // If it's a GitHub release URL (not already resolved to direct), resolve it
+  if (downloadUrl.includes('github.com') && downloadUrl.includes('/releases/tag/')) {
+    toast('Löse Release auf…', 'info');
+    const resolved = await tv.resolveGithubRelease(downloadUrl);
+    if (!resolved) { toast('Release konnte nicht aufgelöst werden', 'error'); return; }
+    downloadUrl = resolved.downloadUrl;
+    fileName = resolved.fileName;
+    totalSize = resolved.size || 0;
+  } else {
+    const parts = downloadUrl.split('/');
+    fileName = parts[parts.length - 1] || fileName;
+  }
+
+  const result = await tv.startDownload({ gameId, downloadUrl, fileName, totalSize });
+  if (result.error) { toast('Download-Fehler: ' + result.error, 'error'); return; }
+
+  activeDownloads[result.downloadId] = {
+    gameId,
+    name: g.title,
+    fileName,
+    progress: 0,
+    speed: 0,
+    received: 0,
+    total: totalSize,
+    done: false,
+  };
+
+  showPage('downloads');
+  toast(`Download gestartet: ${g.title}`, 'success');
+}
+
+// ── Scan a game ───────────────────────────────────────────────────────────────
+async function scanGame(gameId) {
+  const g = games.find(x => x.id === gameId);
+  if (!g || !g.localPath) { toast('Keine lokale Datei zum Scannen', 'error'); return; }
+  showPage('scanner');
+  await startScan(g.localPath);
+}
+
+// ── Delete game ───────────────────────────────────────────────────────────────
+async function deleteGame(id) {
+  await tv.deleteGame(id);
+  games = games.filter(g => g.id !== id);
+  renderHome();
+  toast('Spiel entfernt', 'info');
+}
+
+// ── Global search ─────────────────────────────────────────────────────────────
+function globalSearch(q) {
+  if (q.length > 1) {
+    document.getElementById('browse-search').value = q;
+    showPage('store-browse');
+    renderBrowse();
   }
 }
-function sidebarClick(el, page){
-  if(el){
-    document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
-    el.classList.add('active');
-  }
-  // Switch top nav
-  const libPages=['library-home','downloads','achievements'];
-  const isLib = libPages.includes(page);
-  document.getElementById('mainnav-store').style.display = isLib ? 'none':'flex';
-  document.getElementById('mainnav-library').style.display = isLib ? 'flex':'none';
-  showPage(page, null);
-}
-function setTopNav(el, section){
-  document.querySelectorAll('.topbar-nav a').forEach(a=>a.classList.remove('active'));
-  el.classList.add('active');
-  if(section==='library') sidebarClick(null,'library-home');
-  else if(section==='community') toast('Community — demnächst verfügbar','info');
-  else { document.getElementById('mainnav-store').style.display='flex'; document.getElementById('mainnav-library').style.display='none'; showPage('store-home',null); }
-}
-function onGlobalSearch(q){
-  if(q.length>1){ currentFilter=null; document.getElementById('browse-search').value=q; showPage('store-browse',null); renderBrowse(); }
-}
 
-// ── SLIDESHOW ──
-function goSlide(n){
-  document.querySelectorAll('.hero-slide').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.hero-dot').forEach(d=>d.classList.remove('active'));
-  document.querySelectorAll('.hero-thumb').forEach(t=>t.classList.remove('active'));
-  document.getElementById('slide-'+n).classList.add('active');
-  document.querySelectorAll('.hero-dot')[n].classList.add('active');
-  document.querySelectorAll('.hero-thumb')[n].classList.add('active');
-  currentSlide = n;
-}
-function startSlideshow(){
-  slideTimer = setInterval(()=>{ goSlide((currentSlide+1)%3); }, 6000);
-}
-
-// ── TOAST ──
-function toast(msg, type='info'){
-  const c = document.getElementById('toast-container');
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg, type='info') {
+  const wrap = document.getElementById('toast-wrap');
   const t = document.createElement('div');
   t.className = `toast ${type}`;
-  t.innerHTML = `<span>${type==='success'?'✓':type==='error'?'✗':'ℹ'}</span><span>${msg}</span>`;
-  c.appendChild(t);
-  setTimeout(()=>t.remove(), 3500);
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✗' : 'i';
+  t.innerHTML = `<span style="font-weight:700;font-size:11px">${icon}</span><span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
 }
 
-function submitUpload(){
-  const name = document.getElementById('upl-name').value;
-  if(!name){ toast('Spielname ist erforderlich','error'); return; }
-  toast('Wird gescannt und eingereicht…','info');
-  setTimeout(()=>toast(`"${name}" erfolgreich eingereicht! Prüfung läuft.`,'success'),2000);
-}
-
-function showGameDetail(name){ toast(`${name} — Detailseite demnächst`,'info'); }
+// ── Init ──────────────────────────────────────────────────────────────────────
+setSrcMode('github');
+buildSidebar();
+loadGames();
 </script>
 </body>
 </html>
