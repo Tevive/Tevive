@@ -1,15 +1,17 @@
 {
   "name": "@workspace/tevive-desktop",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Tevive - Free game platform desktop client",
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dist:win": "tsc -p tsconfig.json && electron-builder --win --x64",
-    "start": "tsc -p tsconfig.json && electron ."
+    "start": "tsc -p tsconfig.json && electron .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "electron-updater": "^6.3.9"
+    "electron-updater": "^6.3.9",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "electron": "^33.3.1",
