@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld("tevive", {
   pickDownloadFolder: () => ipcRenderer.invoke("pick-download-folder"),
   pickScreenshotsFolder: () => ipcRenderer.invoke("pick-screenshots-folder"),
   clearCache: () => ipcRenderer.invoke("clear-cache"),
+  resetAllData: () => ipcRenderer.invoke("reset-all-data"),
 
   // Auth
   register: (d: unknown) => ipcRenderer.invoke("auth-register", d),
