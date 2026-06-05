@@ -621,6 +621,14 @@ ipcMain.handle("get-app-version", () => APP_VERSION);
 ipcMain.handle("pick-download-folder", async () => { const r = await dialog.showOpenDialog({ title: "Choose download folder", properties: ["openDirectory","createDirectory"] }); return r.canceled ? null : r.filePaths[0]; });
 ipcMain.handle("pick-screenshots-folder", async () => { const r = await dialog.showOpenDialog({ title: "Choose screenshots folder", properties: ["openDirectory","createDirectory"] }); return r.canceled ? null : r.filePaths[0]; });
 ipcMain.handle("clear-cache", () => { try { const cacheDir = path.join(userData, "cache"); if (fs.existsSync(cacheDir)) fs.rmSync(cacheDir, { recursive: true, force: true }); return { cleared: true }; } catch (e: unknown) { return { error: (e as Error).message }; } });
+ipcMain.handle("reset-all-data", () => {
+  for (const f of [gamesFile, usersFile, scansFile, achievementsFile, friendsFile, notifFile, activityFile]) {
+    try { if (fs.existsSync(f)) fs.unlinkSync(f); } catch {}
+  }
+  const dlDir = path.join(userData, "downloads");
+  try { if (fs.existsSync(dlDir)) fs.rmSync(dlDir, { recursive: true, force: true }); } catch {}
+  return { ok: true };
+});
 ipcMain.handle("detect-steam-games", () => {
   const steamPaths = [
     "C:\\Program Files (x86)\\Steam\\steamapps\\common",
